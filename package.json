@@ -1,5 +1,5 @@
 {
-  "name": "sabi-auth-lib",
+  "name": "@stefan/sabi-auth",
   "version": "1.0.0",
   "description": "",
   "main": "index.ts",
