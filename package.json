@@ -1,0 +1,14 @@
+{
+  "name": "sabi-auth-lib",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "dependencies": {},
+  "peerDependencies": {
+    "next": ">=13.0.0",
+    "react": ">=18.0.0"
+  },
+  "keywords": [],
+  "author": "Stefan Asemota",
+  "license": "ISC"
+}
