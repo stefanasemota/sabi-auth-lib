@@ -57,3 +57,20 @@ export async function loginAdmin(formData: FormData, correctPassword: string | u
 
   return { success: true };
 }
+
+/**
+ * 3. THE LOGOUT ACTION
+ * Clears the __session cookie to log the user out.
+ */
+export async function logoutAdmin() {
+    // Dynamic import prevents this from breaking in non-server environments
+    const { cookies } = await import('next/headers');
+    
+    // In Next.js 14.2.5, we call cookies() directly. 
+    // We use 'await' here to be "Future-Proof" for Next.js 15.
+    const cookieStore = await cookies();
+    
+    cookieStore.delete('__session');
+    
+    return { success: true };
+  }
