@@ -1,16 +1,24 @@
 {
   "name": "@stefan/sabi-auth",
-  "version": "1.0.2",
-  "description": "",
-  "main": "index.ts",
+  "version": "1.0.3",
+  "description": "Custom Auth for Sabi AI Ecosystem",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prepare": "npm run build"
+  },
   "peerDependencies": {
     "next": ">=13.0.0",
     "react": ">=18.0.0"
   },
-  "keywords": [],
-  "author": "Stefan Asemota",
-  "license": "ISC",
   "devDependencies": {
-    "next": "^16.1.1"
+    "@types/node": "^20.19.27",
+    "@types/react": "^18.3.27",
+    "next": "^14.0.0",
+    "typescript": "^5.9.3"
   }
 }
