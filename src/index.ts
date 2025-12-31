@@ -1,9 +1,10 @@
 // index.ts
 
-export * from './SabiAuthProvider'; // Add this line to export the Provider and Hook
-
-
+import { SabiAuthProvider, useAuth } from './SabiAuthProvider';
 import { NextResponse, NextRequest } from 'next/server';
+
+// Explicitly export them by name
+export { SabiAuthProvider, useAuth };
 
 /**
  * 1. THE MIDDLEWARE FACTORY

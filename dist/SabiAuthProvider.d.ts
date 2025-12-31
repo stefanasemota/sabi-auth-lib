@@ -10,9 +10,9 @@ interface AuthContextType {
     login: () => Promise<void>;
     logout: () => Promise<void>;
 }
-export declare function SabiAuthProvider({ children, firebaseConfig }: {
+export declare const SabiAuthProvider: ({ children, firebaseConfig }: {
     children: React.ReactNode;
     firebaseConfig: any;
-}): import("react/jsx-runtime").JSX.Element;
+}) => import("react/jsx-runtime").JSX.Element;
 export declare const useAuth: () => AuthContextType;
 export {};

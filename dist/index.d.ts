@@ -1,5 +1,6 @@
-export * from './SabiAuthProvider';
+import { SabiAuthProvider, useAuth } from './SabiAuthProvider';
 import { NextResponse, NextRequest } from 'next/server';
+export { SabiAuthProvider, useAuth };
 /**
  * 1. THE MIDDLEWARE FACTORY
  * Ensures Firebase compatibility and prevents redirect loops.

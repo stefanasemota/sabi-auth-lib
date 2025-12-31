@@ -20,7 +20,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function SabiAuthProvider({ children, firebaseConfig }: { children: React.ReactNode, firebaseConfig: any }) {
+export const SabiAuthProvider = ({ children, firebaseConfig }: { children: React.ReactNode, firebaseConfig: any }) => {
   const [user, setUser] = useState<SabiUser | null>(null);
   const [loading, setLoading] = useState(true);
 

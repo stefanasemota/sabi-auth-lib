@@ -16,9 +16,6 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 }) : function(o, v) {
     o["default"] = v;
 });
-var __exportStar = (this && this.__exportStar) || function(m, exports) {
-    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
-};
 var __importStar = (this && this.__importStar) || (function () {
     var ownKeys = function(o) {
         ownKeys = Object.getOwnPropertyNames || function (o) {
@@ -37,10 +34,13 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.useAuth = exports.SabiAuthProvider = void 0;
 exports.createAdminMiddleware = createAdminMiddleware;
 exports.loginAdmin = loginAdmin;
 exports.logoutAdmin = logoutAdmin;
-__exportStar(require("./SabiAuthProvider"), exports); // Add this line to export the Provider and Hook
+const SabiAuthProvider_1 = require("./SabiAuthProvider");
+Object.defineProperty(exports, "SabiAuthProvider", { enumerable: true, get: function () { return SabiAuthProvider_1.SabiAuthProvider; } });
+Object.defineProperty(exports, "useAuth", { enumerable: true, get: function () { return SabiAuthProvider_1.useAuth; } });
 const server_1 = require("next/server");
 /**
  * 1. THE MIDDLEWARE FACTORY
