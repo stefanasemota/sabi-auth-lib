@@ -4,12 +4,13 @@
     "module": "CommonJS",
     "declaration": true,
     "outDir": "./dist",
+    "rootDir": "./src",
     "strict": true,
     "jsx": "react-jsx",
     "esModuleInterop": true,
     "skipLibCheck": true,
     "moduleResolution": "node"
   },
-  "include": ["**/*.ts", "**/*.tsx"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
 }

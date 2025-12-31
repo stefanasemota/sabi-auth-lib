@@ -1,4 +1,8 @@
 // index.ts
+
+export * from './SabiAuthProvider'; // Add this line to export the Provider and Hook
+
+
 import { NextResponse, NextRequest } from 'next/server';
 
 /**

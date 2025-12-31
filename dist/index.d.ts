@@ -1,3 +1,4 @@
+export * from './SabiAuthProvider';
 import { NextResponse, NextRequest } from 'next/server';
 /**
  * 1. THE MIDDLEWARE FACTORY
