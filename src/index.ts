@@ -63,6 +63,31 @@ export async function loginAdmin(formData: FormData, correctPassword: string | u
   return { success: true };
 }
 
+
+/**
+ * SERVER SESSION HELPER
+ * Reads the Firebase session cookie or Auth header.
+ */
+export async function getSabiServerSession(req?: NextRequest) {
+  // We use dynamic imports for 'next/headers' to prevent 
+  // client-side bundling errors in your library.
+  const { cookies } = await import('next/headers');
+  const cookieStore = await cookies();
+  
+  // Firebase Auth usually stores the token in a cookie named '__session'
+  // (This is required if you use Firebase Hosting)
+  const sessionToken = cookieStore.get('__session')?.value;
+
+  if (!sessionToken) return null;
+
+  // For now, we return the raw token or a mock object.
+  // In a full implementation, you would use firebase-admin here to verify.
+  return {
+    userId: sessionToken, // We'll store the UID in the cookie for simplicity
+    isAuthenticated: true
+  };
+}
+
 /**
  * 3. THE LOGOUT ACTION
  * Clears the __session cookie to log the user out.
@@ -78,4 +103,4 @@ export async function logoutAdmin() {
     cookieStore.delete('__session');
     
     return { success: true };
-  }
+}

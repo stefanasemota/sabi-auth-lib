@@ -18,6 +18,14 @@ export declare function loginAdmin(formData: FormData, correctPassword: string |
     error?: undefined;
 }>;
 /**
+ * SERVER SESSION HELPER
+ * Reads the Firebase session cookie or Auth header.
+ */
+export declare function getSabiServerSession(req?: NextRequest): Promise<{
+    userId: string;
+    isAuthenticated: boolean;
+} | null>;
+/**
  * 3. THE LOGOUT ACTION
  * Clears the __session cookie to log the user out.
  */

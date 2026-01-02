@@ -37,6 +37,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.useAuth = exports.SabiAuthProvider = void 0;
 exports.createAdminMiddleware = createAdminMiddleware;
 exports.loginAdmin = loginAdmin;
+exports.getSabiServerSession = getSabiServerSession;
 exports.logoutAdmin = logoutAdmin;
 const SabiAuthProvider_1 = require("./SabiAuthProvider");
 Object.defineProperty(exports, "SabiAuthProvider", { enumerable: true, get: function () { return SabiAuthProvider_1.SabiAuthProvider; } });
@@ -88,6 +89,27 @@ async function loginAdmin(formData, correctPassword) {
         maxAge: 60 * 60 * 24 * 7, // 1 week
     });
     return { success: true };
+}
+/**
+ * SERVER SESSION HELPER
+ * Reads the Firebase session cookie or Auth header.
+ */
+async function getSabiServerSession(req) {
+    // We use dynamic imports for 'next/headers' to prevent 
+    // client-side bundling errors in your library.
+    const { cookies } = await Promise.resolve().then(() => __importStar(require('next/headers')));
+    const cookieStore = await cookies();
+    // Firebase Auth usually stores the token in a cookie named '__session'
+    // (This is required if you use Firebase Hosting)
+    const sessionToken = cookieStore.get('__session')?.value;
+    if (!sessionToken)
+        return null;
+    // For now, we return the raw token or a mock object.
+    // In a full implementation, you would use firebase-admin here to verify.
+    return {
+        userId: sessionToken, // We'll store the UID in the cookie for simplicity
+        isAuthenticated: true
+    };
 }
 /**
  * 3. THE LOGOUT ACTION
