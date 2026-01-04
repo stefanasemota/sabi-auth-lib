@@ -3,6 +3,7 @@ import { User } from 'firebase/auth';
 type Plan = 'WAKA' | 'GBEDU' | 'KPATAKPATA';
 interface SabiUser extends User {
     role?: Plan;
+    aiCredits?: number;
 }
 interface AuthContextType {
     user: SabiUser | null;
