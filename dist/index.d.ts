@@ -22,7 +22,7 @@ export declare function loginAdmin(formData: FormData, correctPassword: string |
  * Reads the Firebase session cookie or Auth header.
  */
 export declare function getSabiServerSession(req?: NextRequest): Promise<{
-    userId: string;
+    userId: any;
     isAuthenticated: boolean;
 } | null>;
 /**
