@@ -9,6 +9,7 @@ build/
 out/
 *.tsbuildinfo
 
+coverage/
 # Debugging and Logs
 npm-debug.log*
 yarn-debug.log*
