@@ -1,15 +1,19 @@
 module.exports = {
   preset: "ts-jest",
   testEnvironment: "node",
-  // Ensure Jest looks in the src folder
+  // Force Jest to only look at the src directory
   roots: ["<rootDir>/src/"],
-  // Look for files in __tests__ or files ending in .test.ts or .spec.ts
-  testMatch: ["**/__tests__/**/*.[jt]s?(x)", "**/?(*.)+(spec|test).[tj]s?(x)"],
+  // Tell Jest to look for TypeScript files
+  moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
+  // This ensures Jest maps the coverage to the TS files
+  collectCoverageFrom: [
+    "src/**/*.{ts,tsx}",
+    "!src/**/*.d.ts",
+    "!src/__tests__/**",
+  ],
+  coverageDirectory: "coverage",
+  coverageReporters: ["lcov", "text", "clover"],
   transform: {
     "^.+\\.tsx?$": "ts-jest",
   },
-  // This is required to generate the report SonarCloud needs
-  collectCoverage: true,
-  coverageDirectory: "coverage",
-  coverageReporters: ["lcov", "text"],
 };

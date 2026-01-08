@@ -1,19 +1,29 @@
-import * as SabiAuth from "../index";
+// src/__tests__/exports.test.ts
+import {
+  SabiAuthProvider,
+  useAuth,
+  getSabiServerSession,
+  createAdminMiddleware,
+  loginAdmin,
+  logoutAdmin,
+} from "../index"; // Points directly to src/index.ts
 
-describe("Sabi Auth Library Exports", () => {
-  test("should export SabiAuthProvider", () => {
-    expect(SabiAuth.SabiAuthProvider).toBeDefined();
+describe("Sabi Auth Library: Package Integrity", () => {
+  test("should have all required client exports", () => {
+    expect(SabiAuthProvider).toBeDefined();
+    expect(useAuth).toBeDefined();
   });
 
-  test("should export useAuth hook", () => {
-    expect(SabiAuth.useAuth).toBeDefined();
+  test("should have all required server exports", () => {
+    expect(getSabiServerSession).toBeDefined();
+    expect(createAdminMiddleware).toBeDefined();
+    expect(loginAdmin).toBeDefined();
+    expect(logoutAdmin).toBeDefined();
   });
 
-  test("should export getSabiServerSession helper", () => {
-    expect(SabiAuth.getSabiServerSession).toBeDefined();
-  });
-
-  test("should export createAdminMiddleware factory", () => {
-    expect(SabiAuth.createAdminMiddleware).toBeDefined();
+  test("exports should be valid functions/components", () => {
+    expect(typeof loginAdmin).toBe("function");
+    expect(typeof useAuth).toBe("function");
+    expect(typeof SabiAuthProvider).toBe("function");
   });
 });
