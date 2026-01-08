@@ -10,7 +10,8 @@
     "firebase": ">=10.0.0"
   },
   "scripts": {
-    "build": "npx tsc",
+    "test": "jest --coverage",
+    "build": "tsc",
     "prepare": "npm run build"
   },
   "devDependencies": {
