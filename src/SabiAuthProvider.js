@@ -1,6 +1,6 @@
 'use client';
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+const __awaiter = function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -9,8 +9,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g = Object.create((typeof Iterator === "function" ? Iterator : Object).prototype);
+const __generator = function (thisArg, body) {
+    let _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g = Object.create((typeof Iterator === "function" ? Iterator : Object).prototype);
     return g.next = verb(0), g["throw"] = verb(1), g["return"] = verb(2), typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
     function verb(n) { return function (v) { return step([n, v]); }; }
     function step(op) {
@@ -38,20 +38,20 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.useAuth = exports.SabiAuthProvider = void 0;
-var react_1 = require("react");
-var app_1 = require("firebase/app");
-var auth_1 = require("firebase/auth");
-var AuthContext = (0, react_1.createContext)(undefined);
-var SabiAuthProvider = function (_a) {
-    var children = _a.children, firebaseConfig = _a.firebaseConfig;
-    var _b = (0, react_1.useState)(null), user = _b[0], setUser = _b[1];
-    var _c = (0, react_1.useState)(true), loading = _c[0], setLoading = _c[1];
+const react_1 = require("react");
+const app_1 = require("firebase/app");
+const auth_1 = require("firebase/auth");
+const AuthContext = (0, react_1.createContext)(undefined);
+const SabiAuthProvider = function (_a) {
+    const children = _a.children, firebaseConfig = _a.firebaseConfig;
+    const _b = (0, react_1.useState)(null), user = _b[0], setUser = _b[1];
+    const _c = (0, react_1.useState)(true), loading = _c[0], setLoading = _c[1];
     // Initialize Firebase Client
-    var app = (0, app_1.getApps)().length === 0 ? (0, app_1.initializeApp)(firebaseConfig) : (0, app_1.getApps)()[0];
-    var auth = (0, auth_1.getAuth)(app);
+    const app = (0, app_1.getApps)().length === 0 ? (0, app_1.initializeApp)(firebaseConfig) : (0, app_1.getApps)()[0];
+    const auth = (0, auth_1.getAuth)(app);
     (0, react_1.useEffect)(function () {
-        var unsubscribe = (0, auth_1.onAuthStateChanged)(auth, function (u) { return __awaiter(void 0, void 0, void 0, function () {
-            return __generator(this, function (_a) {
+        const unsubscribe = (0, auth_1.onAuthStateChanged)(auth, function (u) { return __awaiter(void 0, void 0, void 0, function () {
+            return __generator(void 0, function (_a) {
                 setUser(u);
                 setLoading(false);
                 // Ensure we are in the browser before touching document
@@ -68,9 +68,9 @@ var SabiAuthProvider = function (_a) {
         }); });
         return function () { return unsubscribe(); };
     }, [auth]);
-    var login = function () { return __awaiter(void 0, void 0, void 0, function () {
-        var provider;
-        return __generator(this, function (_a) {
+    const login = function () { return __awaiter(void 0, void 0, void 0, function () {
+        let provider;
+        return __generator(void 0, function (_a) {
             switch (_a.label) {
                 case 0:
                     provider = new auth_1.GoogleAuthProvider();
@@ -81,8 +81,8 @@ var SabiAuthProvider = function (_a) {
             }
         });
     }); };
-    var logout = function () { return __awaiter(void 0, void 0, void 0, function () {
-        return __generator(this, function (_a) {
+    const logout = function () { return __awaiter(void 0, void 0, void 0, function () {
+        return __generator(void 0, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, (0, auth_1.signOut)(auth)];
                 case 1:
@@ -96,8 +96,8 @@ var SabiAuthProvider = function (_a) {
     </AuthContext.Provider>);
 };
 exports.SabiAuthProvider = SabiAuthProvider;
-var useAuth = function () {
-    var context = (0, react_1.useContext)(AuthContext);
+const useAuth = function () {
+    const context = (0, react_1.useContext)(AuthContext);
     if (!context)
         throw new Error('useAuth must be used within SabiAuthProvider');
     return context;
