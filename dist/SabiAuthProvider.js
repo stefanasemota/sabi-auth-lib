@@ -17,54 +17,46 @@ const SabiAuthProvider = ({ children, firebaseConfig, }) => {
     const db = (0, firestore_1.getFirestore)(app); // Initialize Firestore
     (0, react_1.useEffect)(() => {
         const unsubscribe = (0, auth_1.onAuthStateChanged)(auth, async (u) => {
+            // 1. Only process if 'u' is actually present or explicitly null
+            if (u === undefined)
+                return;
             console.log("🔐 SabiAuth: State changed, UID:", u?.uid);
             if (u) {
-                // 2. SET COOKIE IMMEDIATELY
-                if (typeof window !== "undefined") {
-                    document.cookie = `__session=${u.uid}; path=/; max-age=604800; SameSite=Lax;`;
-                    console.log("🍪 SabiAuth: Cookie __session set.");
-                }
-                // 3. FETCH ROLE FROM FIRESTORE
-                try {
-                    const userDoc = await (0, firestore_1.getDoc)((0, firestore_1.doc)(db, "users", u.uid));
-                    if (userDoc.exists()) {
-                        const userData = userDoc.data();
-                        console.log("📊 SabiAuth: Firestore data found:", userData.role);
-                        // Merge Firebase Auth user with Firestore Role/Credits
-                        setUser({
-                            ...u,
-                            role: userData.role || "WAKA",
-                            aiCredits: userData.aiCredits || 0,
-                        });
-                    }
-                    else {
-                        console.warn("⚠️ SabiAuth: No Firestore doc for user.");
-                        setUser(u);
-                    }
-                }
-                catch (err) {
-                    console.error("❌ SabiAuth: Firestore fetch failed:", err);
-                    setUser(u);
-                }
+                // Set Cookie
+                document.cookie = `__session=${u.uid}; path=/; max-age=604800; SameSite=Lax;`;
+                // Fetch Firestore Role
+                const userDoc = await (0, firestore_1.getDoc)((0, firestore_1.doc)(db, "users", u.uid));
+                const userData = userDoc.data();
+                setUser({
+                    ...u,
+                    role: userData?.role || "WAKA",
+                    aiCredits: userData?.aiCredits || 0,
+                });
             }
             else {
-                // 4. CLEANUP ON LOGOUT
                 setUser(null);
-                if (typeof window !== "undefined") {
-                    document.cookie = `__session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;`;
-                }
+                document.cookie = `__session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;`;
             }
             setLoading(false);
         });
         return () => unsubscribe();
     }, [auth, db]);
+    // <AI-LOCK-START>
     const login = async () => {
-        const provider = new auth_1.GoogleAuthProvider();
-        // We add 'setCustomParameters' to ensure it prompts for account selection
-        provider.setCustomParameters({ prompt: "select_account" });
-        // This triggers a full page redirect to Google
-        await (0, auth_1.signInWithRedirect)(auth, provider);
+        try {
+            const provider = new auth_1.GoogleAuthProvider();
+            provider.setCustomParameters({ prompt: "select_account" });
+            // THE FIX: Use Popup again, but wrap it in a small timeout
+            // This ensures any "active file chooser" is fully cleared by the browser first
+            setTimeout(async () => {
+                await (0, auth_1.signInWithPopup)(auth, provider);
+            }, 100);
+        }
+        catch (error) {
+            console.error("SabiAuth Login Error:", error);
+        }
     };
+    // <AI-LOCK-END>
     const logout = async () => {
         await (0, auth_1.signOut)(auth);
     };
