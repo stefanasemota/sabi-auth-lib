@@ -6,7 +6,7 @@ import {
   getAuth,
   onAuthStateChanged,
   GoogleAuthProvider,
-  signInWithPopup,
+  signInWithRedirect,
   signOut,
   User,
 } from "firebase/auth";
@@ -91,7 +91,11 @@ export const SabiAuthProvider = ({
 
   const login = async () => {
     const provider = new GoogleAuthProvider();
-    await signInWithPopup(auth, provider);
+    // We add 'setCustomParameters' to ensure it prompts for account selection
+    provider.setCustomParameters({ prompt: "select_account" });
+
+    // This triggers a full page redirect to Google
+    await signInWithRedirect(auth, provider);
   };
 
   const logout = async () => {
