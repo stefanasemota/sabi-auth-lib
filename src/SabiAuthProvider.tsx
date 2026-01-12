@@ -10,14 +10,15 @@ import {
   signOut,
   User,
 } from "firebase/auth";
-// 1. ADD THESE FIRESTORE IMPORTS
 import { getFirestore, doc, getDoc } from "firebase/firestore";
 
-type Plan = "WAKA" | "GBEDU" | "KPATAKPATA";
-
+/**
+ * GENERIC USER TYPE
+ * Extends standard Firebase User with a simple isAdmin flag.
+ * All app-specific roles (Gbedu, VIP, etc.) live in the app, not here.
+ */
 interface SabiUser extends User {
-  role?: Plan;
-  aiCredits?: number;
+  isAdmin: boolean;
 }
 
 interface AuthContextType {
@@ -39,32 +40,39 @@ export const SabiAuthProvider = ({
   const [user, setUser] = useState<SabiUser | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Initialize Firebase services
   const app =
     getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
   const auth = getAuth(app);
-  const db = getFirestore(app); // Initialize Firestore
+  const db = getFirestore(app);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (u) => {
-      // 1. Only process if 'u' is actually present or explicitly null
+      // Logic: Wait for explicit result from Firebase
       if (u === undefined) return;
 
-      console.log("🔐 SabiAuth: State changed, UID:", u?.uid);
+      console.log("🔐 SabiAuth: Identity established:", u?.email);
 
       if (u) {
-        // Set Cookie
+        // 1. SYNC COOKIE FOR SERVER COMPONENTS
+        // This allows Next.js Middleware and Server Actions to see the UID
         document.cookie = `__session=${u.uid}; path=/; max-age=604800; SameSite=Lax;`;
 
-        // Fetch Firestore Role
-        const userDoc = await getDoc(doc(db, "users", u.uid));
-        const userData = userDoc.data();
+        // 2. CHECK GLOBAL ADMIN STATUS
+        // Every Sabi app uses 'roles_admin' for the owner/moderators
+        try {
+          const adminDoc = await getDoc(doc(db, "roles_admin", u.uid));
 
-        setUser({
-          ...u,
-          role: userData?.role || "WAKA",
-          aiCredits: userData?.aiCredits || 0,
-        } as SabiUser);
+          setUser({
+            ...u,
+            isAdmin: adminDoc.exists(),
+          } as SabiUser);
+        } catch (err) {
+          console.error("⚠️ SabiAuth: Admin check failed", err);
+          setUser({ ...u, isAdmin: false } as SabiUser);
+        }
       } else {
+        // 3. CLEANUP
         setUser(null);
         document.cookie = `__session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;`;
       }
@@ -80,11 +88,10 @@ export const SabiAuthProvider = ({
       const provider = new GoogleAuthProvider();
       provider.setCustomParameters({ prompt: "select_account" });
 
-      // THE FIX: Use Popup again, but wrap it in a small timeout
-      // This ensures any "active file chooser" is fully cleared by the browser first
+      // Small timeout fixes the "active file chooser" block on Mac/Chrome
       setTimeout(async () => {
         await signInWithPopup(auth, provider);
-      }, 100);
+      }, 150);
     } catch (error) {
       console.error("SabiAuth Login Error:", error);
     }

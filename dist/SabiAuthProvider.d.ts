@@ -1,9 +1,12 @@
 import React from "react";
 import { User } from "firebase/auth";
-type Plan = "WAKA" | "GBEDU" | "KPATAKPATA";
+/**
+ * GENERIC USER TYPE
+ * Extends standard Firebase User with a simple isAdmin flag.
+ * All app-specific roles (Gbedu, VIP, etc.) live in the app, not here.
+ */
 interface SabiUser extends User {
-    role?: Plan;
-    aiCredits?: number;
+    isAdmin: boolean;
 }
 interface AuthContextType {
     user: SabiUser | null;
