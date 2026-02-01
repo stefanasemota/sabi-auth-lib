@@ -5,9 +5,20 @@
 ## 🚀 Key Features
 
 *   **Dual-Layer Auth:** Unified handling of Admin Password protection AND Firebase User Identity.
-*   **Identity Tiers:** Native support for `WAKA`, `GBEDU`, and `KPATAKPATA` plan roles.
 *   **Firebase Native:** Optimized for the `__session` cookie to bypass Firebase's aggressive cookie stripping.
 *   **Strictly Typed:** Full TypeScript support with verified `dist` outputs to eliminate "undefined" component errors.
+
+---
+
+## 🏗 Architecture (Onion)
+
+This project follows **Onion Architecture** principles to ensure modularity and testability.
+
+*   **Core Layer (`src/core/`)**: Contains pure domain definitions (`description.ts`). No external dependencies.
+*   **Application Services (`src/application/`)**: Contains business logic (`admin.service.ts`). Orchestrates data flow.
+*   **Infrastructure (`src/`)**: Components (`SabiAuthProvider.tsx`) that bind the core to frameworks (Next.js, Firebase).
+
+Dependencies always point **inward**: Infrastructure -> Application -> Core.
 
 ---
 
@@ -125,9 +136,13 @@ export const config = {
 This library follows a strict build process to ensure `dist/` files are always in sync with GitHub tags.
 
 1. **Restructure Source:** Code lives in `/src`, compiles to `/dist`.
-2. **Generate Build:** `npm run build`
-3. **Grep Check:** `grep "exports.SabiAuthProvider" dist/index.js`
-4. **Tag & Push:**
+2. **Quality Standards:**
+    *   **Max File Size:** 75 lines. (Refactor if exceeded).
+    *   **Test Coverage:** Minimum 75% logic coverage.
+3. **Run Tests:** `npm test`
+4. **Generate Build:** `npm run build`
+5. **Grep Check:** `grep "exports.SabiAuthProvider" dist/index.js`
+6. **Tag & Push:**
 
 ```bash
 git add . && git commit -m "feat: release v1.1.3"

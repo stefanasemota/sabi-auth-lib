@@ -1,6 +1,8 @@
 "use client";
 
+
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { SabiUser, AuthContextType } from "./core/domain";
 import { initializeApp, getApps } from "firebase/app";
 import {
   getAuth,
@@ -12,21 +14,6 @@ import {
 } from "firebase/auth";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
 
-/**
- * GENERIC USER TYPE
- * Extends standard Firebase User with a simple isAdmin flag.
- * All app-specific roles (Gbedu, VIP, etc.) live in the app, not here.
- */
-interface SabiUser extends User {
-  isAdmin: boolean;
-}
-
-interface AuthContextType {
-  user: SabiUser | null;
-  loading: boolean;
-  login: () => Promise<void>;
-  logout: () => Promise<void>;
-}
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
