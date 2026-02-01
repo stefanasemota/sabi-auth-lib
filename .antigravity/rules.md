@@ -15,3 +15,7 @@
 
 ## 4. Review Policy
 - **Review-Driven**: All terminal executions and file overwrites require a manual review check.
+
+## 5.Versioning Protocol
+- **Strict Prohibition**: Never manually edit the "version" string in `package.json`.
+- **Command Requirement**: Always use `npm version <patch|minor|major>`. This command is atomic; it updates the JSON, creates the Git commit, and generates the Git tag in one step.
