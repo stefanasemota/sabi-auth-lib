@@ -12,6 +12,7 @@
   "scripts": {
     "test": "npx jest --coverage",
     "build": "tsc",
+    "ship": "git push origin main --tags",
     "prepare": "npm run build"
   },
   "devDependencies": {
