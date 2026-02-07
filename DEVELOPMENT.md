@@ -1,41 +1,41 @@
 # 🛠 @stefan/sabi-auth Development Guide
 
-Welcome back! Here is everything you need to know to get productive in 5 minutes.
+Welcome! This guide helps you maintain the library and ensure high quality.
 
 ## 🧅 1. Architecture Summary (Onion)
 
 We strictly follow **Onion Architecture**. Dependencies flow **inward**.
 
-*   **Core (`src/core/`)**: Pure TypeScript interfaces and entities (e.g., `SabiUser`, `AuthContextType`).
+*   **Core (`src/core/`)**: Pure TypeScript interfaces and entities (e.g., `SabiUser`).
     *   *Rule*: NO imports from outside Core.
 *   **Application (`src/application/`)**: Business logic and use cases (e.g., `admin.service.ts`).
     *   *Rule*: Can import Core, but NOT React/UI.
 *   **Infrastructure (`src/`)**: Framework code (React Provider, Next.js).
     *   *Rule*: Binds App Services to the UI.
 
-## 🚢 2. The /ship Command
+## 🚢 2. Releasing (The /ship Command)
 
-To release a new version, we use a strict "tag-first" workflow enforced by Git hooks.
+To release a new version, follow this sequence:
 
-**The Workflow:**
-1.  **Bump Version**: `npm version <patch|minor|major>`
-    *   *Auto-updates `package.json` AND creates a Git tag.*
-2.  **Ship It**: `npm run ship`
+1.  **Bump Version**: Manually update `version` in `package.json` (e.g., `1.3.10`).
+2.  **Commit**: `git add . && git commit -m "chore: release v1.3.10"`
+3.  **Tag**: `git tag v1.3.10`
+4.  **Ship**: `npm run ship`
     *   *Pushes commits and tags to origin.*
 
-> **Why?** A `pre-push` hook blocks any push where `package.json` version != Git Tag. This command ensures they stay synced.
+## 🧪 3. Testing & Coverage
 
-## 🧪 3. Testing & Coverage (The 80% Rule)
-
-We maintain **>80% test coverage**.
+We maintain high test coverage for core logic.
 
 *   **Run Tests**: `npm test`
     *   *(Runs `jest --coverage`)*
-*   **Target**: Check the table output. Low coverage? Write tests in `src/__tests__/`.
+*   **Mocks**: 
+    *   Firestore and Auth mocks are configured in `src/__tests__/`.
+    *   When adding new actions, ensure you mock the `db` instance in your tests.
 
 ### Quick Tips
-*   **Jest + JSdom** is configured for React component testing.
-*   **Firebase Mocks** are already set up in `src/__tests__/SabiAuthProvider.test.tsx`. Copy pattern if needed.
+- **Serialized Data**: All data returned from Server Actions MUST be POJOs. Convert timestamps to ISO strings.
+- **Generic Actions**: Favor dependency injection for `db` instances to keep actions generic.
 
 ---
-*Now get back to coding! 🇳🇬🔥*
+*Build once, Sabi everywhere. 🇳🇬🔥*

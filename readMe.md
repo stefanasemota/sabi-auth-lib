@@ -1,126 +1,101 @@
-# 🔐 @stefan/sabi-auth (v1.1.3)
+# @stefanasemota/sabi-auth
 
-**@stefan/sabi-auth** is a robust, strictly-typed authentication and identity layer designed for the Sabi AI ecosystem. It provides a unified source of truth for both **Admin Security** and **User Monetization** in Next.js applications hosted on Firebase App Hosting.
+[![Version](https://img.shields.io/github/v/tag/stefanasemota/sabi-auth-lib?label=version&color=orange)](https://github.com/stefanasemota/sabi-auth-lib)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## 🚀 Key Features
+A lightweight, generic Authentication & User Management library for Next.js and Firebase. Designed to bridge the gap between Firebase Auth and Firestore with pure, dependency-injected Server Actions.
 
-*   **Dual-Layer Auth:** Unified handling of Admin Password protection AND Firebase User Identity.
-*   **Firebase Native:** Optimized for the `__session` cookie to bypass Firebase's aggressive cookie stripping.
-*   **Strictly Typed:** Full TypeScript support with verified `dist` outputs to eliminate "undefined" component errors.
+> **Published on npm:** `@stefanasemota/sabi-auth`
 
----
+## 🚀 Features
 
-## 🏗 Architecture (Onion)
+- **Dependency Injection:** Pass your own Firestore instance. No hardcoded logic.
+- **Next.js 15 Ready:** Fully serialized data for Server/Client boundaries.
+- **Identity Resolution:** Pure logic that finalizes profile POJOs or generates new user templates.
+- **Locked Fields:** Professional-grade one-time identity verification logic.
+- **Unit Tested:** 100% coverage on core auth services.
 
-This project follows **Onion Architecture** principles to ensure modularity and testability.
+## 📦 Installation
 
-*   **Core Layer (`src/core/`)**: Contains pure domain definitions (`description.ts`). No external dependencies.
-*   **Application Services (`src/application/`)**: Contains business logic (`admin.service.ts`). Orchestrates data flow.
-*   **Infrastructure (`src/`)**: Components (`SabiAuthProvider.tsx`) that bind the core to frameworks (Next.js, Firebase).
-
-Dependencies always point **inward**: Infrastructure -> Application -> Core.
-
----
-
-## 📦 1. Installation
-
-Install the library directly from your GitHub repository using the version tag:
+Install from npm:
 
 ```bash
-npm install github:stefanasemota/sabi-auth-lib.git#v1.1.3
+npm install @stefanasemota/sabi-auth
 ```
 
-## ⚙️ 2. Configuration
+Or install directly from GitHub:
 
-### A. Next.js Configuration (next.config.js)
-
-To ensure Next.js correctly handles the library's TypeScript/ESM output, add it to `transpilePackages`:
-
-```javascript
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  transpilePackages: ['@stefan/sabi-auth'], 
-};
-
-module.exports = nextConfig;
+```bash
+npm install git+https://github.com/stefanasemota/sabi-auth-lib.git#v1.3.10
 ```
 
-### B. Environment Variables (.env.local)
+## 🛠️ Configuration
 
-The library requires your Firebase Client configuration to initialize the Auth Provider.
+The library expects the following environment variables to be handled by your parent app:
 
-```text
-NEXT_PUBLIC_FIREBASE_API_KEY=...
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=...
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=...
-# ... other Firebase keys
+- `SESSION_COOKIE_NAME` (Optional)
+- `ADMIN_PASSWORD` (Required for Middleware)
+
+### Peer Dependencies
+
+Ensure your project has the following installed:
+
+```bash
+npm install firebase firebase-admin next react react-dom
 ```
 
-## 🛠 3. Client-Side Usage (Identity & UI)
+## 📖 Usage
 
-### A. Root Provider (layout.tsx)
-
-Wrap your application in the `SabiAuthProvider`. This initializes the Firebase heartbeat and makes user data available app-wide.
-
-```tsx
-import { SabiAuthProvider } from '@stefan/sabi-auth';
-
-const firebaseConfig = { /* your config */ };
-
-export default function RootLayout({ children }) {
-  return (
-    <SabiAuthProvider firebaseConfig={firebaseConfig}>
-      {children}
-    </SabiAuthProvider>
-  );
-}
-```
-
-### B. Accessing User Status (useAuth)
-
-Use the hook to check roles (`WAKA`, `GBEDU`, `KPATAKPATA`) and trigger login popups.
-
-```tsx
-'use client';
-import { useAuth } from '@stefan/sabi-auth';
-
-export function PremiumFeature() {
-  const { user, login, loading } = useAuth();
-  const isPremium = user?.role === 'GBEDU' || user?.role === 'KPATAKPATA';
-
-  if (loading) return <span>Loading...</span>;
-  if (!user) return <button onClick={login}>Login with Google</button>;
-
-  return isPremium ? <p>Full Afrobeat Unlocked! 🎸</p> : <p>Upgrade to Gbedu</p>;
-}
-```
-
-## 🛠 4. Server-Side Usage (Fulfillment & Webhooks)
-
-### A. Protecting API Routes (getSabiServerSession)
-
-Use this helper in your Server Actions or Route Handlers (like Stripe Checkout) to verify the user's identity via the `__session` cookie.
+### 1. Resolve User Identity
+Pure logic function that finalizes a user profile or generates a new template.
 
 ```typescript
-import { getSabiServerSession } from '@stefan/sabi-auth';
+import { resolveUserIdentityAction } from "@stefanasemota/sabi-auth";
+import { getFirestore } from "firebase-admin/firestore";
 
-export async function POST(req: Request) {
-  const session = await getSabiServerSession(req);
-  
-  if (!session?.userId) {
-    return new Response("Unauthorized", { status: 401 });
-  }
-  
-  // Use session.userId to create Stripe sessions
-}
+const db = getFirestore();
+const userDoc = await db.collection("users").doc(userId).get();
+const userData = userDoc.exists ? userDoc.data() : null;
+
+const result = await resolveUserIdentityAction(
+  userId,
+  "WAKA", // defaultRole
+  userData // POJO from Firestore or null
+);
 ```
 
-### B. Admin Middleware Factory
-
-Protect your `/admin` dashboards using the built-in middleware factory.
+### 2. Get Authenticated User
+Validate the session and get the user's basic metadata.
 
 ```typescript
-import { createAdminMiddleware } from '@stefan/sabi-auth';
+import { getAuthUserAction } from "@stefanasemota/sabi-auth";
+
+const { isAuthenticated, user } = await getAuthUserAction();
+```
+
+### 3. Update Locked Fields
+Set a field (like `creatorName`) that can only be set once.
+
+```typescript
+import { updateLockedFieldAction } from "@stefanasemota/sabi-auth";
+import { getFirestore } from "firebase-admin/firestore";
+
+const db = getFirestore();
+
+await updateLockedFieldAction(
+  db,
+  "user-123",
+  "creatorName",
+  "Burna Boy Jr",
+  "creatorNameSet"
+);
+```
+
+### 4. Middleware Protection
+Protect admin routes using the middleware factory.
+
+```typescript
+import { createAdminMiddleware } from "@stefanasemota/sabi-auth";
 
 export const middleware = createAdminMiddleware(process.env.ADMIN_PASSWORD);
 
@@ -129,33 +104,19 @@ export const config = {
 };
 ```
 
-## 🏗 5. Library Maintenance (For Developers)
+## 🧪 Development & Testing
 
-### Build & Release Flow
-
-This library follows a strict build process to ensure `dist/` files are always in sync with GitHub tags.
-
-1. **Restructure Source:** Code lives in `/src`, compiles to `/dist`.
-2. **Quality Standards:**
-    *   **Max File Size:** 75 lines. (Refactor if exceeded).
-    *   **Test Coverage:** Minimum 75% logic coverage.
-3. **Run Tests:** `npm test`
-4. **Generate Build:** `npm run build`
-5. **Grep Check:** `grep "exports.SabiAuthProvider" dist/index.js`
-6. **Tag & Push:**
+To run the test suite:
 
 ```bash
-git add . && git commit -m "feat: release v1.1.3"
-git tag -a v1.1.3 -m "Stable production release"
-git push origin main --tags
+npm test
 ```
 
-## 🛡 6. Troubleshooting
+To release a new version:
 
-*   **Component is undefined?** Ensure you are using Named Imports: `import { SabiAuthProvider }`.
-*   **Types not found?** Ensure your `package.json` includes `"types": "dist/index.d.ts"`.
-*   **Firebase Init Error?** Double-check that you are passing the `firebaseConfig` object to the provider in your root layout.
+```bash
+npm run ship
+```
 
----
-
-**Build once, Sabi everywhere. 🇳🇬🔥**
+## 📄 License
+MIT © Stefan Asemota

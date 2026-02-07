@@ -6,6 +6,7 @@
 
 import { NextResponse, NextRequest } from "next/server";
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
 import type { Firestore } from "firebase-admin/firestore";
 
 /**
@@ -50,7 +51,6 @@ export async function loginAdmin(
         return { success: false, error: "Invalid credentials" };
     }
 
-    const { cookies } = await import("next/headers");
     const cookieStore = await cookies();
 
     cookieStore.set("__session", correctPassword, {
@@ -68,8 +68,7 @@ export async function loginAdmin(
  * SERVER SESSION HELPER
  * Verifies the __session cookie on the server.
  */
-export async function getSabiServerSession(req?: NextRequest) {
-    const { cookies } = await import("next/headers");
+export async function getSabiServerSession() {
     const cookieStore = await cookies();
     const sessionToken = cookieStore.get("__session")?.value;
 
@@ -86,7 +85,6 @@ export async function getSabiServerSession(req?: NextRequest) {
  * Clears the __session cookie.
  */
 export async function logoutAdmin() {
-    const { cookies } = await import("next/headers");
     const cookieStore = await cookies();
     cookieStore.delete("__session");
     return { success: true };

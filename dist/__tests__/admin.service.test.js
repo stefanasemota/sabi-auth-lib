@@ -1,27 +1,26 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const admin_service_1 = require("../application/admin.service");
-// Mock dependencies
-jest.mock('../application/admin.service', () => {
-    const originalModule = jest.requireActual('../application/admin.service');
-    return {
-        ...originalModule,
-        getSabiServerSession: jest.fn(),
-    };
-});
-const mockCookieStore = {
-    get: jest.fn(),
-    delete: jest.fn(),
-    set: jest.fn()
-};
-// Mock Next.js headers and cache
+// Mock Next.js headers with a factory that allows dynamic return values
 jest.mock("next/headers", () => ({
-    cookies: jest.fn().mockReturnValue(mockCookieStore)
+    cookies: jest.fn(),
 }));
 jest.mock("next/cache", () => ({
     revalidatePath: jest.fn()
 }));
 describe('Admin Service (Generic Auth Actions)', () => {
+    // Setup the mock return value before tests
+    const mockCookieStore = {
+        get: jest.fn(),
+        delete: jest.fn(),
+        set: jest.fn()
+    };
+    // We need to access the mocked cookies function to set its return value
+    const { cookies } = require("next/headers");
+    beforeEach(() => {
+        jest.clearAllMocks();
+        cookies.mockReturnValue(Promise.resolve(mockCookieStore));
+    });
     describe('getAuthUserAction', () => {
         it('should return isAuthenticated: false if session is invalid', async () => {
             mockCookieStore.get.mockReturnValue(undefined);

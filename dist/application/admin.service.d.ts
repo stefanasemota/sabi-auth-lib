@@ -25,7 +25,7 @@ export declare function loginAdmin(formData: FormData, correctPassword: string |
  * SERVER SESSION HELPER
  * Verifies the __session cookie on the server.
  */
-export declare function getSabiServerSession(req?: NextRequest): Promise<{
+export declare function getSabiServerSession(): Promise<{
     userId: string;
     isAuthenticated: boolean;
 } | null>;
