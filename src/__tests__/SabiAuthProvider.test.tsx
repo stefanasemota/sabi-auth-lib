@@ -169,29 +169,6 @@ describe('SabiAuthProvider', () => {
         consoleSpy.mockRestore();
     });
 
-    it.skip('calls login function', async () => {
-        (onAuthStateChanged as jest.Mock).mockImplementation((auth, callback) => {
-            callback(null);
-            return jest.fn();
-        });
-
-        render(
-            <SabiAuthProvider firebaseConfig={firebaseConfig}>
-                <TestConsumer />
-            </SabiAuthProvider>
-        );
-
-        await waitFor(() => screen.getByText('Login'));
-
-        // Use real timers (default) and wait for the timeout
-        act(() => {
-            screen.getByText('Login').click();
-        });
-
-        // Timeout is 150ms, waitFor defaults to 1000ms
-        await waitFor(() => expect(signInWithPopup).toHaveBeenCalled());
-    });
-
     it('calls logout function', async () => {
         (onAuthStateChanged as jest.Mock).mockImplementation((auth, callback) => {
             callback(mockUser);

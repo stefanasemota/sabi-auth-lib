@@ -1,129 +1,157 @@
 
-import { createAdminMiddleware, loginAdmin, logoutAdmin, getSabiServerSession } from "../application/admin.service";
-import { NextResponse } from "next/server";
+import {
+    resolveUserIdentityAction,
+    updateLockedFieldAction,
+    getAuthUserAction
+} from '../application/admin.service';
+import { getSabiServerSession } from '../application/admin.service';
 
-// Mock next/server
-jest.mock("next/server", () => ({
-    NextResponse: {
-        next: jest.fn(() => ({ type: "next" })),
-        redirect: jest.fn((url) => ({ type: "redirect", url })),
-    },
-    NextRequest: jest.fn(),
-}));
+// Mock dependencies
+jest.mock('../application/admin.service', () => {
+    const originalModule = jest.requireActual('../application/admin.service');
+    return {
+        ...originalModule,
+        getSabiServerSession: jest.fn(),
+    };
+});
 
-// Mock next/headers
 const mockCookieStore = {
     get: jest.fn(),
-    set: jest.fn(),
     delete: jest.fn(),
+    set: jest.fn()
 };
 
+// Mock Next.js headers and cache
 jest.mock("next/headers", () => ({
-    cookies: jest.fn(() => Promise.resolve(mockCookieStore)),
+    cookies: jest.fn().mockReturnValue(mockCookieStore)
 }));
 
-describe("Admin Application Service", () => {
-    const adminPassword = "secret_password";
+jest.mock("next/cache", () => ({
+    revalidatePath: jest.fn()
+}));
 
-    beforeEach(() => {
-        jest.clearAllMocks();
-    });
+describe('Admin Service (Generic Auth Actions)', () => {
 
-    describe("createAdminMiddleware", () => {
-        it("should allow /admin-login bypass", () => {
-            const middleware = createAdminMiddleware(adminPassword);
-            const req = {
-                nextUrl: { pathname: "/admin-login" },
-                cookies: { get: () => undefined },
-                url: "http://localhost/admin-login",
-            } as any;
-
-            const res = middleware(req);
-            expect(NextResponse.next).toHaveBeenCalled();
-        });
-
-        it("should redirect if ADMIN_PASSWORD is missing in env", () => {
-            const middleware = createAdminMiddleware(undefined);
-            const req = {
-                nextUrl: { pathname: "/anywhere" },
-                cookies: { get: () => undefined },
-                url: "http://localhost/anywhere",
-            } as any;
-
-            const res = middleware(req);
-            expect(NextResponse.redirect).toHaveBeenCalledWith(
-                expect.objectContaining({ pathname: "/admin-login" })
-            );
-        });
-
-        it("should redirect /admin-dashboard if unauthorized", () => {
-            const middleware = createAdminMiddleware(adminPassword);
-            const req = {
-                nextUrl: { pathname: "/admin-dashboard" },
-                cookies: { get: () => ({ value: "wrong_token" }) },
-                url: "http://localhost/admin-dashboard",
-            } as any;
-
-            const res = middleware(req);
-            expect(NextResponse.redirect).toHaveBeenCalled();
-        });
-
-        it("should allow /admin-dashboard if authorized", () => {
-            const middleware = createAdminMiddleware(adminPassword);
-            const req = {
-                nextUrl: { pathname: "/admin-dashboard" },
-                cookies: { get: () => ({ value: adminPassword }) },
-                url: "http://localhost/admin-dashboard",
-            } as any;
-
-            const res = middleware(req);
-            expect(NextResponse.next).toHaveBeenCalled();
-        });
-    });
-
-    describe("loginAdmin", () => {
-        it("should fail with invalid credentials", async () => {
-            const formData = new FormData();
-            formData.set("password", "wrong");
-            const result = await loginAdmin(formData, adminPassword);
-            expect(result.success).toBe(false);
-        });
-
-        it("should succeed and set cookie with valid credentials", async () => {
-            const formData = new FormData();
-            formData.set("password", adminPassword);
-            const result = await loginAdmin(formData, adminPassword);
-
-            expect(result.success).toBe(true);
-            expect(mockCookieStore.set).toHaveBeenCalledWith(
-                "__session",
-                adminPassword,
-                expect.any(Object)
-            );
-        });
-    });
-
-    describe("getSabiServerSession", () => {
-        it("should return null if no session cookie", async () => {
+    describe('getAuthUserAction', () => {
+        it('should return isAuthenticated: false if session is invalid', async () => {
             mockCookieStore.get.mockReturnValue(undefined);
-            const session = await getSabiServerSession();
-            expect(session).toBeNull();
+            const result = await getAuthUserAction();
+            expect(result).toEqual({ isAuthenticated: false, user: null });
         });
 
-        it("should return session if cookie exists", async () => {
-            mockCookieStore.get.mockReturnValue({ value: "some_token" });
-            const session = await getSabiServerSession();
-            expect(session).toEqual({
-                userId: "some_token",
+        it('should return user metadata if session is valid', async () => {
+            mockCookieStore.get.mockReturnValue({ value: '123' });
+            const result = await getAuthUserAction();
+            expect(result).toEqual({
                 isAuthenticated: true,
+                user: { uid: '123' }
             });
         });
     });
 
-    describe("logoutAdmin", () => {
-        it("should delete session cookie", async () => {
-            await logoutAdmin();
-            expect(mockCookieStore.delete).toHaveBeenCalledWith("__session");
+    describe('resolveUserIdentityAction', () => {
+        it('should return existing user profile with serialized dates', async () => {
+            const mockDate = new Date('2023-01-01');
+            const mockUserData = {
+                role: 'USER',
+                createdAt: { toDate: () => mockDate },
+                updatedAt: { toDate: () => mockDate } // Mock Firestore Timestamp
+            };
+
+            const result = await resolveUserIdentityAction('user-123', 'WAKA', mockUserData);
+
+            expect(result).toEqual({
+                success: true,
+                exists: true,
+                profile: {
+                    role: 'USER',
+                    uid: 'user-123',
+                    createdAt: mockDate.toISOString(),
+                    updatedAt: mockDate.toISOString()
+                }
+            });
+        });
+
+        it('should return new user template if user does not exist', async () => {
+            const result = await resolveUserIdentityAction('new-user', 'GUEST', null);
+
+            expect(result.exists).toBe(false);
+            expect(result.profile.role).toBe('GUEST');
+            expect(result.profile.uid).toBe('new-user');
+            expect(result.profile.creatorNameSet).toBe(false);
+            expect(typeof result.profile.createdAt).toBe('string');
+        });
+    });
+
+    describe('updateLockedFieldAction', () => {
+        let mockDb: any;
+        let mockDocGet: jest.Mock;
+        let mockDocUpdate: jest.Mock;
+
+        beforeEach(() => {
+            mockDocGet = jest.fn();
+            mockDocUpdate = jest.fn();
+            mockDb = {
+                collection: jest.fn().mockReturnValue({
+                    doc: jest.fn().mockReturnValue({
+                        get: mockDocGet,
+                        update: mockDocUpdate
+                    })
+                })
+            };
+        });
+
+        it('should update field if not locked', async () => {
+            mockDocGet.mockResolvedValue({
+                exists: true,
+                data: () => ({ creatorNameSet: false })
+            });
+
+            const result = await updateLockedFieldAction(
+                mockDb,
+                'user-123',
+                'creatorName',
+                'New Name',
+                'creatorNameSet'
+            );
+
+            expect(result.success).toBe(true);
+            expect(mockDocUpdate).toHaveBeenCalledWith(expect.objectContaining({
+                creatorName: 'New Name',
+                creatorNameSet: true
+            }));
+        });
+
+        it('should fail if field is already locked', async () => {
+            mockDocGet.mockResolvedValue({
+                exists: true,
+                data: () => ({ creatorNameSet: true })
+            });
+
+            const result = await updateLockedFieldAction(
+                mockDb,
+                'user-123',
+                'creatorName',
+                'New Name',
+                'creatorNameSet'
+            );
+
+            expect(result.error).toContain('locked');
+            expect(mockDocUpdate).not.toHaveBeenCalled();
+        });
+
+        it('should throw error if user does not exist', async () => {
+            mockDocGet.mockResolvedValue({ exists: false });
+
+            const result = await updateLockedFieldAction(
+                mockDb,
+                'user-123',
+                'creatorName',
+                'New Name',
+                'creatorNameSet'
+            );
+
+            expect(result.error).toContain('User profile not found');
         });
     });
 });

@@ -5,6 +5,8 @@
  */
 
 import { NextResponse, NextRequest } from "next/server";
+import { revalidatePath } from "next/cache";
+import type { Firestore } from "firebase-admin/firestore";
 
 /**
  * 1. THE MIDDLEWARE FACTORY
@@ -88,4 +90,148 @@ export async function logoutAdmin() {
     const cookieStore = await cookies();
     cookieStore.delete("__session");
     return { success: true };
+}
+
+// ============================================================================
+// PART 4: GENERIC AUTH ACTIONS (v1.3.9)
+// ============================================================================
+
+/**
+ * GENERIC ACTION: getAuthUserAction
+ * verifying the session cookie and returning basic auth metadata.
+ * NO DATABASE FETCHING. PURE SESSION VERIFICATION.
+ */
+export async function getAuthUserAction() {
+    try {
+        const session = await getSabiServerSession();
+
+        if (!session || !session.isAuthenticated) {
+            return { isAuthenticated: false, user: null };
+        }
+
+        return {
+            isAuthenticated: true,
+            user: {
+                uid: session.userId,
+                // We don't have email/displayName in the cookie-only session
+                // The app must fetch profile if needed.
+            }
+        };
+    } catch (error: any) {
+        console.error("❌ Error in getAuthUserAction:", error);
+        return { isAuthenticated: false, error: error.message };
+    }
+}
+
+/**
+ * GENERIC ACTION: resolveUserIdentityAction
+ * Pure Logic: Returns the finalized profile or a new user template.
+ * Does NOT write to DB.
+ * 
+ * @param userId - The user's UID
+ * @param defaultRole - Role to assign if user doesn't exist (e.g., 'WAKA')
+ * @param userData - The raw user document data (POJO) or null/undefined
+ */
+export async function resolveUserIdentityAction(userId: string, defaultRole: string, userData: any) {
+    try {
+        if (userData) {
+            // 1. User exists, return their serialized data
+            return {
+                success: true,
+                exists: true,
+                profile: {
+                    ...userData,
+                    uid: userId,
+                    // Mandatory serialization for Next.js 15
+                    createdAt: userData?.createdAt?.toDate ? userData.createdAt.toDate().toISOString() : userData?.createdAt,
+                    updatedAt: userData?.updatedAt?.toDate ? userData.updatedAt.toDate().toISOString() : userData?.updatedAt,
+                }
+            };
+        }
+
+        // 2. NEW USER: Create the initial profile template
+        const newProfile = {
+            uid: userId,
+            role: defaultRole, // "WAKA", "USER", etc.
+            creatorNameSet: false,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+        };
+
+        return {
+            success: true,
+            exists: false,
+            message: "User profile initialized.",
+            profile: newProfile
+        };
+    } catch (error: any) {
+        console.error("❌ Error resolving user identity:", error);
+        return { success: false, error: error.message };
+    }
+}
+
+/**
+ * GENERIC ACTION: updateLockedFieldAction
+ * 1. Checks the lock field.
+ * 2. Updates the target field.
+ * 3. Sets the lock field to true.
+ * 
+ * @param db - Firestore instance (Dependency Injection)
+ * @param userId - User UID
+ * @param fieldName - Field to update (e.g., 'creatorName')
+ * @param value - Value to set
+ * @param lockFieldName - Boolean field that locks this update (e.g., 'creatorNameSet')
+ * @param pathsToRevalidate - Optional list of paths to revalidate
+ */
+export async function updateLockedFieldAction(
+    db: Firestore,
+    userId: string,
+    fieldName: string,
+    value: any,
+    lockFieldName: string,
+    pathsToRevalidate: string[] = []
+) {
+    // 1. Validation
+    if (!value || (typeof value === 'string' && value.trim().length < 2)) {
+        return { error: `Invalid value for ${fieldName}.` };
+    }
+
+    try {
+        const userRef = db.collection("users").doc(userId);
+        const userDoc = await userRef.get();
+
+        if (!userDoc.exists) {
+            return { error: "User profile not found." };
+        }
+
+        const userData = userDoc.data();
+
+        // 2. THE SECURITY LOCK
+        if (userData?.[lockFieldName] === true) {
+            return {
+                error: `This field is locked. Contact support to change.`
+            };
+        }
+
+        // 3. ATOMIC UPDATE
+        // We use a plain object update. Caller provides db, so we assume server env.
+        await userRef.update({
+            [fieldName]: typeof value === 'string' ? value.trim() : value,
+            [lockFieldName]: true, // Lock the vault
+            updatedAt: new Date().toISOString() // Assuming string storage for standard
+        });
+
+        // 4. SYNC CACHE
+        if (pathsToRevalidate.length > 0) {
+            pathsToRevalidate.forEach(p => revalidatePath(p));
+        }
+
+        return {
+            success: true,
+            message: `Locked! ${fieldName} set to: ${value}`
+        };
+    } catch (error: any) {
+        console.error("❌ Error in updateLockedFieldAction:", error);
+        return { error: "System busy. Try again later." };
+    }
 }

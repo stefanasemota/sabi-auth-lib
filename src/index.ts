@@ -11,7 +11,10 @@ export { SabiAuthProvider, useAuth };
 // 2. Re-export Application Services
 export {
   createAdminMiddleware,
-  loginAdmin,
+  getAuthUserAction,
   getSabiServerSession,
+  loginAdmin,
   logoutAdmin,
+  resolveUserIdentityAction,
+  updateLockedFieldAction,
 } from "./application/admin.service";
