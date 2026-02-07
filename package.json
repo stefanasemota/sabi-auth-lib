@@ -1,5 +1,5 @@
 {
-  "name": "@stefan/sabi-auth",
+  "name": "@stefanasemota/sabi-auth",
   "version": "1.3.9",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -7,13 +7,14 @@
     "dist"
   ],
   "dependencies": {
+    "@stefanasemota/stripe-core-service": "git+https://github.com/stefanasemota/stripe-core-service.git#v1.0.11",
     "firebase": ">=10.0.0"
   },
   "scripts": {
     "test": "npx jest --coverage",
     "build": "tsc",
     "ship": "git push origin main --tags",
-    "prepare": "npm run build"
+    "prepare": "npm run build && (test -d .git && npx husky install || true)"
   },
   "devDependencies": {
     "@testing-library/dom": "^10.4.1",

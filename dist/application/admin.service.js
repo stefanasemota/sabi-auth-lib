@@ -210,7 +210,7 @@ async function updateLockedFieldAction(db, userId, fieldName, value, lockFieldNa
         const userRef = db.collection("users").doc(userId);
         const userDoc = await userRef.get();
         if (!userDoc.exists) {
-            throw new Error("User profile not found.");
+            return { error: "User profile not found." };
         }
         const userData = userDoc.data();
         // 2. THE SECURITY LOCK

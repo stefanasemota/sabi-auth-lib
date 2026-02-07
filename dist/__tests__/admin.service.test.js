@@ -106,7 +106,7 @@ describe('Admin Service (Generic Auth Actions)', () => {
         it('should throw error if user does not exist', async () => {
             mockDocGet.mockResolvedValue({ exists: false });
             const result = await (0, admin_service_1.updateLockedFieldAction)(mockDb, 'user-123', 'creatorName', 'New Name', 'creatorNameSet');
-            expect(result.error).toContain('System busy'); // Catches the thrown error
+            expect(result.error).toContain('User profile not found');
         });
     });
 });
