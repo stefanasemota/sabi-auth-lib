@@ -14,3 +14,5 @@ export {
     resolveUserIdentityAction,
     updateLockedFieldAction,
 } from "./application/admin.service";
+
+export { logAuthEvent } from "@stefanasemota/sabi-logger";
