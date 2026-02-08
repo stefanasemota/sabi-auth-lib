@@ -10,11 +10,11 @@ Data flows from the user through the application to the security layer and final
 
 ```mermaid
 graph TD
-    User([👤 User]) -->|Interacts| NS[📱 NaijaSpeak App]
-    NS -->|Calls| SA[🔐 Sabi-Auth Lib]
+    User(["👤 User"]) -->|Interacts| NS["📱 NaijaSpeak (Next.js 15)"]
+    NS -->|Calls| SA["🔐 Sabi-Auth"]
     SA -->|Validates Session| SA
-    SA -->|Emits Event| SL[📜 Sabi-Logger Lib]
-    SL -->|Writes Immutable Log| SH[🛡️ Security Hub (Audit Project)]
+    SA -->|Emits Event| SL["📜 Sabi-Logger"]
+    SL -->|Writes Immutable Log| SH["🛡️ Security Hub"]
 ```
 
 ## 3. Security Model
