@@ -3,6 +3,7 @@
  * Contains business logic for Admin authentication and session management.
  * Layer: Application Services (Onion Architecture)
  */
+import 'server-only';
 import { NextResponse, NextRequest } from "next/server";
 import type { Firestore } from "firebase-admin/firestore";
 import type { Auth } from "firebase-admin/auth";

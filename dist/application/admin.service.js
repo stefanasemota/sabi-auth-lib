@@ -12,6 +12,7 @@ exports.deleteUserSessionAction = deleteUserSessionAction;
 exports.getAuthUserAction = getAuthUserAction;
 exports.resolveUserIdentityAction = resolveUserIdentityAction;
 exports.updateLockedFieldAction = updateLockedFieldAction;
+require("server-only");
 const server_1 = require("next/server");
 const cache_1 = require("next/cache");
 const headers_1 = require("next/headers");

@@ -4,6 +4,8 @@
  * Layer: Application Services (Onion Architecture)
  */
 
+import 'server-only';
+
 import { NextResponse, NextRequest } from "next/server";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
