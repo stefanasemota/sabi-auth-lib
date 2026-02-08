@@ -20,9 +20,11 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const SabiAuthProvider = ({
   children,
   firebaseConfig,
+  onLoginCallback,
 }: {
   children: React.ReactNode;
   firebaseConfig: any;
+  onLoginCallback?: (uid: string) => Promise<void>;
 }) => {
   const [user, setUser] = useState<SabiUser | null>(null);
   const [loading, setLoading] = useState(true);
@@ -54,6 +56,15 @@ export const SabiAuthProvider = ({
             ...u,
             isAdmin: adminDoc.exists(),
           } as SabiUser);
+
+          // 3. TRIGGER SERVER-SIDE LOGIN LOGGING (if callback provided)
+          if (onLoginCallback) {
+            try {
+              await onLoginCallback(u.uid);
+            } catch (error) {
+              console.error("⚠️ SabiAuth: Login callback failed (non-blocking)", error);
+            }
+          }
         } catch (err) {
           console.error("⚠️ SabiAuth: Admin check failed", err);
           setUser({ ...u, isAdmin: false } as SabiUser);

@@ -8,7 +8,7 @@ const app_1 = require("firebase/app");
 const auth_1 = require("firebase/auth");
 const firestore_1 = require("firebase/firestore");
 const AuthContext = (0, react_1.createContext)(undefined);
-const SabiAuthProvider = ({ children, firebaseConfig, }) => {
+const SabiAuthProvider = ({ children, firebaseConfig, onLoginCallback, }) => {
     const [user, setUser] = (0, react_1.useState)(null);
     const [loading, setLoading] = (0, react_1.useState)(true);
     // Initialize Firebase services
@@ -33,6 +33,15 @@ const SabiAuthProvider = ({ children, firebaseConfig, }) => {
                         ...u,
                         isAdmin: adminDoc.exists(),
                     });
+                    // 3. TRIGGER SERVER-SIDE LOGIN LOGGING (if callback provided)
+                    if (onLoginCallback) {
+                        try {
+                            await onLoginCallback(u.uid);
+                        }
+                        catch (error) {
+                            console.error("⚠️ SabiAuth: Login callback failed (non-blocking)", error);
+                        }
+                    }
                 }
                 catch (err) {
                     console.error("⚠️ SabiAuth: Admin check failed", err);
