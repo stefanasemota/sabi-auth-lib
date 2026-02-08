@@ -4,4 +4,4 @@
  */
 import { SabiAuthProvider, useAuth } from "./SabiAuthProvider";
 export { SabiAuthProvider, useAuth };
-export { createAdminMiddleware, getAuthUserAction, getSabiServerSession, loginAdmin, logoutAdmin, resolveUserIdentityAction, updateLockedFieldAction, } from "./application/admin.service";
+export { createAdminMiddleware, getAuthUserAction, getSabiServerSession, loginAdmin, deleteUserSessionAction, resolveUserIdentityAction, updateLockedFieldAction, } from "./application/admin.service";

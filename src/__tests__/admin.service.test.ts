@@ -15,6 +15,10 @@ jest.mock("next/cache", () => ({
     revalidatePath: jest.fn()
 }));
 
+jest.mock("@stefanasemota/sabi-logger", () => ({
+    logAuthEvent: jest.fn()
+}), { virtual: true });
+
 describe('Admin Service (Generic Auth Actions)', () => {
 
     // Setup the mock return value before tests
@@ -80,6 +84,83 @@ describe('Admin Service (Generic Auth Actions)', () => {
             expect(result.profile.uid).toBe('new-user');
             expect(result.profile.creatorNameSet).toBe(false);
             expect(typeof result.profile.createdAt).toBe('string');
+        });
+    });
+
+
+    describe('loginAdmin', () => {
+        let mockDb: any;
+        const mockFormData = new FormData();
+        mockFormData.append('password', 'secure-password');
+
+        beforeEach(() => {
+            mockDb = { collection: jest.fn() };
+        });
+
+        it('should return error for invalid credentials', async () => {
+            const { loginAdmin } = require('../application/admin.service');
+            const result = await loginAdmin(mockDb, 'app-id', mockFormData, 'wrong-password');
+            expect(result.success).toBe(false);
+            expect(result.error).toBe('Invalid credentials');
+        });
+
+        it('should set cookie and log event on success', async () => {
+            const { loginAdmin } = require('../application/admin.service');
+            const { logAuthEvent } = require('@stefanasemota/sabi-logger');
+
+            const result = await loginAdmin(mockDb, 'app-id', mockFormData, 'secure-password');
+
+            expect(result.success).toBe(true);
+            expect(mockCookieStore.set).toHaveBeenCalledWith(
+                '__session',
+                'secure-password',
+                expect.any(Object)
+            );
+            expect(logAuthEvent).toHaveBeenCalledWith(mockDb, {
+                uid: 'ADMIN_SHARED',
+                appId: 'app-id',
+                eventType: 'LOGIN',
+                metadata: { type: 'admin_password' }
+            });
+        });
+    });
+
+    describe('deleteUserSessionAction', () => {
+        let mockDb: any;
+        let mockAuth: any;
+
+        beforeEach(() => {
+            mockDb = { collection: jest.fn() };
+            mockAuth = { revokeRefreshTokens: jest.fn() };
+        });
+
+        it('should revoke tokens, log logout, and delete cookie', async () => {
+            mockCookieStore.get.mockReturnValue({ value: 'user-123' });
+            const { deleteUserSessionAction } = require('../application/admin.service');
+            const { logAuthEvent } = require('@stefanasemota/sabi-logger');
+
+            const result = await deleteUserSessionAction(mockAuth, mockDb, 'app-id');
+
+            expect(result.success).toBe(true);
+            expect(mockAuth.revokeRefreshTokens).toHaveBeenCalledWith('user-123');
+            expect(logAuthEvent).toHaveBeenCalledWith(mockDb, {
+                uid: 'user-123',
+                appId: 'app-id',
+                eventType: 'LOGOUT'
+            });
+            expect(mockCookieStore.delete).toHaveBeenCalledWith('__session');
+        });
+
+        it('should handle errors cleanly (non-blocking)', async () => {
+            mockCookieStore.get.mockReturnValue({ value: 'user-123' });
+            mockAuth.revokeRefreshTokens.mockRejectedValue(new Error('Firebase error'));
+            const { deleteUserSessionAction } = require('../application/admin.service');
+
+            // Should not throw
+            const result = await deleteUserSessionAction(mockAuth, mockDb, 'app-id');
+
+            expect(result.success).toBe(true);
+            expect(mockCookieStore.delete).toHaveBeenCalledWith('__session');
         });
     });
 

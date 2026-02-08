@@ -14,7 +14,7 @@ export {
   getAuthUserAction,
   getSabiServerSession,
   loginAdmin,
-  logoutAdmin,
+  deleteUserSessionAction,
   resolveUserIdentityAction,
   updateLockedFieldAction,
 } from "./application/admin.service";

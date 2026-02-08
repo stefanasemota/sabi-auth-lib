@@ -8,13 +8,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createAdminMiddleware = createAdminMiddleware;
 exports.loginAdmin = loginAdmin;
 exports.getSabiServerSession = getSabiServerSession;
-exports.logoutAdmin = logoutAdmin;
+exports.deleteUserSessionAction = deleteUserSessionAction;
 exports.getAuthUserAction = getAuthUserAction;
 exports.resolveUserIdentityAction = resolveUserIdentityAction;
 exports.updateLockedFieldAction = updateLockedFieldAction;
 const server_1 = require("next/server");
 const cache_1 = require("next/cache");
 const headers_1 = require("next/headers");
+const sabi_logger_1 = require("@stefanasemota/sabi-logger");
 /**
  * 1. THE MIDDLEWARE FACTORY
  * Ensures Firebase compatibility and prevents redirect loops.
@@ -38,11 +39,17 @@ function createAdminMiddleware(adminPassword) {
         return server_1.NextResponse.next();
     };
 }
+// ... imports are already there ...
 /**
  * 2. THE LOGIN ACTION
  * Sets the __session cookie for Admin access.
+ *
+ * @param db - Firestore instance (Dependency Injection)
+ * @param appId - App ID for logging
+ * @param formData - Login form data
+ * @param correctPassword - The expected admin password
  */
-async function loginAdmin(formData, correctPassword) {
+async function loginAdmin(db, appId, formData, correctPassword) {
     const password = formData.get("password");
     if (!correctPassword || password !== correctPassword) {
         return { success: false, error: "Invalid credentials" };
@@ -54,6 +61,13 @@ async function loginAdmin(formData, correctPassword) {
         sameSite: "lax",
         path: "/",
         maxAge: 60 * 60 * 24 * 7, // 1 week
+    });
+    // Log the generic admin login
+    await (0, sabi_logger_1.logAuthEvent)(db, {
+        uid: "ADMIN_SHARED",
+        appId,
+        eventType: "LOGIN",
+        metadata: { type: "admin_password" }
     });
     return { success: true };
 }
@@ -72,11 +86,32 @@ async function getSabiServerSession() {
     };
 }
 /**
- * 3. THE LOGOUT ACTION
- * Clears the __session cookie.
+ * 3. THE LOGOUT ACTION (Generic)
+ * Clears the __session cookie and revokes tokens.
+ *
+ * @param auth - Firebase Auth instance for token revocation
+ * @param db - Firestore instance for logging
+ * @param appId - App ID for logging
  */
-async function logoutAdmin() {
+async function deleteUserSessionAction(auth, db, appId) {
     const cookieStore = await (0, headers_1.cookies)();
+    const sessionToken = cookieStore.get("__session")?.value;
+    if (sessionToken) {
+        try {
+            // Revoke refresh tokens for the user
+            await auth.revokeRefreshTokens(sessionToken);
+            // Log the logout event
+            await (0, sabi_logger_1.logAuthEvent)(db, {
+                uid: sessionToken,
+                appId,
+                eventType: "LOGOUT"
+            });
+        }
+        catch (error) {
+            console.error("Error in deleteUserSessionAction (revoke/log):", error);
+            // Non-blocking error, still clear cookie
+        }
+    }
     cookieStore.delete("__session");
     return { success: true };
 }

@@ -8,6 +8,8 @@ import { NextResponse, NextRequest } from "next/server";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import type { Firestore } from "firebase-admin/firestore";
+import type { Auth } from "firebase-admin/auth";
+import { logAuthEvent } from "@stefanasemota/sabi-logger";
 
 /**
  * 1. THE MIDDLEWARE FACTORY
@@ -37,11 +39,20 @@ export function createAdminMiddleware(adminPassword: string | undefined) {
     };
 }
 
+// ... imports are already there ...
+
 /**
  * 2. THE LOGIN ACTION
  * Sets the __session cookie for Admin access.
+ * 
+ * @param db - Firestore instance (Dependency Injection)
+ * @param appId - App ID for logging
+ * @param formData - Login form data
+ * @param correctPassword - The expected admin password
  */
 export async function loginAdmin(
+    db: Firestore,
+    appId: string,
     formData: FormData,
     correctPassword: string | undefined
 ) {
@@ -59,6 +70,14 @@ export async function loginAdmin(
         sameSite: "lax",
         path: "/",
         maxAge: 60 * 60 * 24 * 7, // 1 week
+    });
+
+    // Log the generic admin login
+    await logAuthEvent(db, {
+        uid: "ADMIN_SHARED",
+        appId,
+        eventType: "LOGIN",
+        metadata: { type: "admin_password" }
     });
 
     return { success: true };
@@ -81,11 +100,38 @@ export async function getSabiServerSession() {
 }
 
 /**
- * 3. THE LOGOUT ACTION
- * Clears the __session cookie.
+ * 3. THE LOGOUT ACTION (Generic)
+ * Clears the __session cookie and revokes tokens.
+ * 
+ * @param auth - Firebase Auth instance for token revocation
+ * @param db - Firestore instance for logging
+ * @param appId - App ID for logging
  */
-export async function logoutAdmin() {
+export async function deleteUserSessionAction(
+    auth: Auth,
+    db: Firestore,
+    appId: string
+) {
     const cookieStore = await cookies();
+    const sessionToken = cookieStore.get("__session")?.value;
+
+    if (sessionToken) {
+        try {
+            // Revoke refresh tokens for the user
+            await auth.revokeRefreshTokens(sessionToken);
+
+            // Log the logout event
+            await logAuthEvent(db, {
+                uid: sessionToken,
+                appId,
+                eventType: "LOGOUT"
+            });
+        } catch (error) {
+            console.error("Error in deleteUserSessionAction (revoke/log):", error);
+            // Non-blocking error, still clear cookie
+        }
+    }
+
     cookieStore.delete("__session");
     return { success: true };
 }

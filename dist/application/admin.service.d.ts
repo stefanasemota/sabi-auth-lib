@@ -5,6 +5,7 @@
  */
 import { NextResponse, NextRequest } from "next/server";
 import type { Firestore } from "firebase-admin/firestore";
+import type { Auth } from "firebase-admin/auth";
 /**
  * 1. THE MIDDLEWARE FACTORY
  * Ensures Firebase compatibility and prevents redirect loops.
@@ -13,8 +14,13 @@ export declare function createAdminMiddleware(adminPassword: string | undefined)
 /**
  * 2. THE LOGIN ACTION
  * Sets the __session cookie for Admin access.
+ *
+ * @param db - Firestore instance (Dependency Injection)
+ * @param appId - App ID for logging
+ * @param formData - Login form data
+ * @param correctPassword - The expected admin password
  */
-export declare function loginAdmin(formData: FormData, correctPassword: string | undefined): Promise<{
+export declare function loginAdmin(db: Firestore, appId: string, formData: FormData, correctPassword: string | undefined): Promise<{
     success: boolean;
     error: string;
 } | {
@@ -30,10 +36,14 @@ export declare function getSabiServerSession(): Promise<{
     isAuthenticated: boolean;
 } | null>;
 /**
- * 3. THE LOGOUT ACTION
- * Clears the __session cookie.
+ * 3. THE LOGOUT ACTION (Generic)
+ * Clears the __session cookie and revokes tokens.
+ *
+ * @param auth - Firebase Auth instance for token revocation
+ * @param db - Firestore instance for logging
+ * @param appId - App ID for logging
  */
-export declare function logoutAdmin(): Promise<{
+export declare function deleteUserSessionAction(auth: Auth, db: Firestore, appId: string): Promise<{
     success: boolean;
 }>;
 /**

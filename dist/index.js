@@ -4,7 +4,7 @@
  * Exports both Client-side Provider/Hook and Server-side Middleware/Session helpers.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateLockedFieldAction = exports.resolveUserIdentityAction = exports.logoutAdmin = exports.loginAdmin = exports.getSabiServerSession = exports.getAuthUserAction = exports.createAdminMiddleware = exports.useAuth = exports.SabiAuthProvider = void 0;
+exports.updateLockedFieldAction = exports.resolveUserIdentityAction = exports.deleteUserSessionAction = exports.loginAdmin = exports.getSabiServerSession = exports.getAuthUserAction = exports.createAdminMiddleware = exports.useAuth = exports.SabiAuthProvider = void 0;
 const SabiAuthProvider_1 = require("./SabiAuthProvider");
 Object.defineProperty(exports, "SabiAuthProvider", { enumerable: true, get: function () { return SabiAuthProvider_1.SabiAuthProvider; } });
 Object.defineProperty(exports, "useAuth", { enumerable: true, get: function () { return SabiAuthProvider_1.useAuth; } });
@@ -14,6 +14,6 @@ Object.defineProperty(exports, "createAdminMiddleware", { enumerable: true, get:
 Object.defineProperty(exports, "getAuthUserAction", { enumerable: true, get: function () { return admin_service_1.getAuthUserAction; } });
 Object.defineProperty(exports, "getSabiServerSession", { enumerable: true, get: function () { return admin_service_1.getSabiServerSession; } });
 Object.defineProperty(exports, "loginAdmin", { enumerable: true, get: function () { return admin_service_1.loginAdmin; } });
-Object.defineProperty(exports, "logoutAdmin", { enumerable: true, get: function () { return admin_service_1.logoutAdmin; } });
+Object.defineProperty(exports, "deleteUserSessionAction", { enumerable: true, get: function () { return admin_service_1.deleteUserSessionAction; } });
 Object.defineProperty(exports, "resolveUserIdentityAction", { enumerable: true, get: function () { return admin_service_1.resolveUserIdentityAction; } });
 Object.defineProperty(exports, "updateLockedFieldAction", { enumerable: true, get: function () { return admin_service_1.updateLockedFieldAction; } });
