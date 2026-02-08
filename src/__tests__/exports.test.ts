@@ -1,4 +1,9 @@
 // src/__tests__/exports.test.ts
+// Mock the logger dependency before imports ensuring it's available for indirect imports
+jest.mock("@stefanasemota/sabi-logger", () => ({
+  logAuthEvent: jest.fn(),
+}), { virtual: true });
+
 import {
   SabiAuthProvider,
   useAuth,

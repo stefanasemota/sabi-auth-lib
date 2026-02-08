@@ -152,6 +152,8 @@ describe('Admin Service (Generic Auth Actions)', () => {
         });
 
         it('should handle errors cleanly (non-blocking)', async () => {
+            const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => { });
+
             mockCookieStore.get.mockReturnValue({ value: 'user-123' });
             mockAuth.revokeRefreshTokens.mockRejectedValue(new Error('Firebase error'));
             const { deleteUserSessionAction } = require('../application/admin.service');
@@ -161,6 +163,14 @@ describe('Admin Service (Generic Auth Actions)', () => {
 
             expect(result.success).toBe(true);
             expect(mockCookieStore.delete).toHaveBeenCalledWith('__session');
+
+            // Verify error logging but suppress output
+            expect(consoleSpy).toHaveBeenCalledWith(
+                "Error in deleteUserSessionAction (revoke/log):",
+                expect.any(Error)
+            );
+
+            consoleSpy.mockRestore();
         });
     });
 
