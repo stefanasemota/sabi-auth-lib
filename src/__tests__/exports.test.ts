@@ -5,7 +5,7 @@ import {
   getSabiServerSession,
   createAdminMiddleware,
   loginAdmin,
-  logoutAdmin,
+  deleteUserSessionAction,
 } from "../index"; // Points directly to src/index.ts
 
 describe("Sabi Auth Library: Package Integrity", () => {
@@ -18,12 +18,13 @@ describe("Sabi Auth Library: Package Integrity", () => {
     expect(getSabiServerSession).toBeDefined();
     expect(createAdminMiddleware).toBeDefined();
     expect(loginAdmin).toBeDefined();
-    expect(logoutAdmin).toBeDefined();
+    expect(deleteUserSessionAction).toBeDefined();
   });
 
   test("exports should be valid functions/components", () => {
     expect(typeof loginAdmin).toBe("function");
     expect(typeof useAuth).toBe("function");
     expect(typeof SabiAuthProvider).toBe("function");
+    expect(typeof deleteUserSessionAction).toBe("function");
   });
 });

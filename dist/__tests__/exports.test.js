@@ -11,11 +11,12 @@ describe("Sabi Auth Library: Package Integrity", () => {
         expect(index_1.getSabiServerSession).toBeDefined();
         expect(index_1.createAdminMiddleware).toBeDefined();
         expect(index_1.loginAdmin).toBeDefined();
-        expect(index_1.logoutAdmin).toBeDefined();
+        expect(index_1.deleteUserSessionAction).toBeDefined();
     });
     test("exports should be valid functions/components", () => {
         expect(typeof index_1.loginAdmin).toBe("function");
         expect(typeof index_1.useAuth).toBe("function");
         expect(typeof index_1.SabiAuthProvider).toBe("function");
+        expect(typeof index_1.deleteUserSessionAction).toBe("function");
     });
 });
