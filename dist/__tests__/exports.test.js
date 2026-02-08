@@ -1,6 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 // src/__tests__/exports.test.ts
+// Mock the logger dependency before imports ensuring it's available for indirect imports
+jest.mock("@stefanasemota/sabi-logger", () => ({
+    logAuthEvent: jest.fn(),
+}), { virtual: true });
 const index_1 = require("../index"); // Points directly to src/index.ts
 describe("Sabi Auth Library: Package Integrity", () => {
     test("should have all required client exports", () => {

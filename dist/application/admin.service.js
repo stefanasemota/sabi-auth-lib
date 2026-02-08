@@ -49,7 +49,7 @@ function createAdminMiddleware(adminPassword) {
  * @param formData - Login form data
  * @param correctPassword - The expected admin password
  */
-async function loginAdmin(db, appId, formData, correctPassword) {
+async function loginAdmin(appId, formData, correctPassword) {
     const password = formData.get("password");
     if (!correctPassword || password !== correctPassword) {
         return { success: false, error: "Invalid credentials" };
@@ -63,7 +63,7 @@ async function loginAdmin(db, appId, formData, correctPassword) {
         maxAge: 60 * 60 * 24 * 7, // 1 week
     });
     // Log the generic admin login
-    await (0, sabi_logger_1.logAuthEvent)(db, {
+    await (0, sabi_logger_1.logAuthEvent)({
         uid: "ADMIN_SHARED",
         appId,
         eventType: "LOGIN",
@@ -93,7 +93,7 @@ async function getSabiServerSession() {
  * @param db - Firestore instance for logging
  * @param appId - App ID for logging
  */
-async function deleteUserSessionAction(auth, db, appId) {
+async function deleteUserSessionAction(auth, appId) {
     const cookieStore = await (0, headers_1.cookies)();
     const sessionToken = cookieStore.get("__session")?.value;
     if (sessionToken) {
@@ -101,7 +101,7 @@ async function deleteUserSessionAction(auth, db, appId) {
             // Revoke refresh tokens for the user
             await auth.revokeRefreshTokens(sessionToken);
             // Log the logout event
-            await (0, sabi_logger_1.logAuthEvent)(db, {
+            await (0, sabi_logger_1.logAuthEvent)({
                 uid: sessionToken,
                 appId,
                 eventType: "LOGOUT"

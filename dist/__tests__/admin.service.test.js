@@ -77,17 +77,17 @@ describe('Admin Service (Generic Auth Actions)', () => {
         });
         it('should return error for invalid credentials', async () => {
             const { loginAdmin } = require('../application/admin.service');
-            const result = await loginAdmin(mockDb, 'app-id', mockFormData, 'wrong-password');
+            const result = await loginAdmin('app-id', mockFormData, 'wrong-password');
             expect(result.success).toBe(false);
             expect(result.error).toBe('Invalid credentials');
         });
         it('should set cookie and log event on success', async () => {
             const { loginAdmin } = require('../application/admin.service');
             const { logAuthEvent } = require('@stefanasemota/sabi-logger');
-            const result = await loginAdmin(mockDb, 'app-id', mockFormData, 'secure-password');
+            const result = await loginAdmin('app-id', mockFormData, 'secure-password');
             expect(result.success).toBe(true);
             expect(mockCookieStore.set).toHaveBeenCalledWith('__session', 'secure-password', expect.any(Object));
-            expect(logAuthEvent).toHaveBeenCalledWith(mockDb, {
+            expect(logAuthEvent).toHaveBeenCalledWith({
                 uid: 'ADMIN_SHARED',
                 appId: 'app-id',
                 eventType: 'LOGIN',
@@ -106,10 +106,10 @@ describe('Admin Service (Generic Auth Actions)', () => {
             mockCookieStore.get.mockReturnValue({ value: 'user-123' });
             const { deleteUserSessionAction } = require('../application/admin.service');
             const { logAuthEvent } = require('@stefanasemota/sabi-logger');
-            const result = await deleteUserSessionAction(mockAuth, mockDb, 'app-id');
+            const result = await deleteUserSessionAction(mockAuth, 'app-id');
             expect(result.success).toBe(true);
             expect(mockAuth.revokeRefreshTokens).toHaveBeenCalledWith('user-123');
-            expect(logAuthEvent).toHaveBeenCalledWith(mockDb, {
+            expect(logAuthEvent).toHaveBeenCalledWith({
                 uid: 'user-123',
                 appId: 'app-id',
                 eventType: 'LOGOUT'
@@ -117,13 +117,17 @@ describe('Admin Service (Generic Auth Actions)', () => {
             expect(mockCookieStore.delete).toHaveBeenCalledWith('__session');
         });
         it('should handle errors cleanly (non-blocking)', async () => {
+            const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => { });
             mockCookieStore.get.mockReturnValue({ value: 'user-123' });
             mockAuth.revokeRefreshTokens.mockRejectedValue(new Error('Firebase error'));
             const { deleteUserSessionAction } = require('../application/admin.service');
             // Should not throw
-            const result = await deleteUserSessionAction(mockAuth, mockDb, 'app-id');
+            const result = await deleteUserSessionAction(mockAuth, 'app-id');
             expect(result.success).toBe(true);
             expect(mockCookieStore.delete).toHaveBeenCalledWith('__session');
+            // Verify error logging but suppress output
+            expect(consoleSpy).toHaveBeenCalledWith("Error in deleteUserSessionAction (revoke/log):", expect.any(Error));
+            consoleSpy.mockRestore();
         });
     });
     describe('updateLockedFieldAction', () => {

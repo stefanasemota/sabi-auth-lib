@@ -99,7 +99,7 @@ describe('Admin Service (Generic Auth Actions)', () => {
 
         it('should return error for invalid credentials', async () => {
             const { loginAdmin } = require('../application/admin.service');
-            const result = await loginAdmin(mockDb, 'app-id', mockFormData, 'wrong-password');
+            const result = await loginAdmin('app-id', mockFormData, 'wrong-password');
             expect(result.success).toBe(false);
             expect(result.error).toBe('Invalid credentials');
         });
@@ -108,7 +108,7 @@ describe('Admin Service (Generic Auth Actions)', () => {
             const { loginAdmin } = require('../application/admin.service');
             const { logAuthEvent } = require('@stefanasemota/sabi-logger');
 
-            const result = await loginAdmin(mockDb, 'app-id', mockFormData, 'secure-password');
+            const result = await loginAdmin('app-id', mockFormData, 'secure-password');
 
             expect(result.success).toBe(true);
             expect(mockCookieStore.set).toHaveBeenCalledWith(
@@ -116,7 +116,7 @@ describe('Admin Service (Generic Auth Actions)', () => {
                 'secure-password',
                 expect.any(Object)
             );
-            expect(logAuthEvent).toHaveBeenCalledWith(mockDb, {
+            expect(logAuthEvent).toHaveBeenCalledWith({
                 uid: 'ADMIN_SHARED',
                 appId: 'app-id',
                 eventType: 'LOGIN',
@@ -139,11 +139,11 @@ describe('Admin Service (Generic Auth Actions)', () => {
             const { deleteUserSessionAction } = require('../application/admin.service');
             const { logAuthEvent } = require('@stefanasemota/sabi-logger');
 
-            const result = await deleteUserSessionAction(mockAuth, mockDb, 'app-id');
+            const result = await deleteUserSessionAction(mockAuth, 'app-id');
 
             expect(result.success).toBe(true);
             expect(mockAuth.revokeRefreshTokens).toHaveBeenCalledWith('user-123');
-            expect(logAuthEvent).toHaveBeenCalledWith(mockDb, {
+            expect(logAuthEvent).toHaveBeenCalledWith({
                 uid: 'user-123',
                 appId: 'app-id',
                 eventType: 'LOGOUT'
@@ -159,7 +159,7 @@ describe('Admin Service (Generic Auth Actions)', () => {
             const { deleteUserSessionAction } = require('../application/admin.service');
 
             // Should not throw
-            const result = await deleteUserSessionAction(mockAuth, mockDb, 'app-id');
+            const result = await deleteUserSessionAction(mockAuth, 'app-id');
 
             expect(result.success).toBe(true);
             expect(mockCookieStore.delete).toHaveBeenCalledWith('__session');

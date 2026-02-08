@@ -20,7 +20,7 @@ export declare function createAdminMiddleware(adminPassword: string | undefined)
  * @param formData - Login form data
  * @param correctPassword - The expected admin password
  */
-export declare function loginAdmin(db: Firestore, appId: string, formData: FormData, correctPassword: string | undefined): Promise<{
+export declare function loginAdmin(appId: string, formData: FormData, correctPassword: string | undefined): Promise<{
     success: boolean;
     error: string;
 } | {
@@ -43,7 +43,7 @@ export declare function getSabiServerSession(): Promise<{
  * @param db - Firestore instance for logging
  * @param appId - App ID for logging
  */
-export declare function deleteUserSessionAction(auth: Auth, db: Firestore, appId: string): Promise<{
+export declare function deleteUserSessionAction(auth: Auth, appId: string): Promise<{
     success: boolean;
 }>;
 /**

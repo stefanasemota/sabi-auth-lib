@@ -51,7 +51,6 @@ export function createAdminMiddleware(adminPassword: string | undefined) {
  * @param correctPassword - The expected admin password
  */
 export async function loginAdmin(
-    db: Firestore,
     appId: string,
     formData: FormData,
     correctPassword: string | undefined
@@ -73,7 +72,7 @@ export async function loginAdmin(
     });
 
     // Log the generic admin login
-    await logAuthEvent(db, {
+    await logAuthEvent({
         uid: "ADMIN_SHARED",
         appId,
         eventType: "LOGIN",
@@ -109,7 +108,6 @@ export async function getSabiServerSession() {
  */
 export async function deleteUserSessionAction(
     auth: Auth,
-    db: Firestore,
     appId: string
 ) {
     const cookieStore = await cookies();
@@ -121,7 +119,7 @@ export async function deleteUserSessionAction(
             await auth.revokeRefreshTokens(sessionToken);
 
             // Log the logout event
-            await logAuthEvent(db, {
+            await logAuthEvent({
                 uid: sessionToken,
                 appId,
                 eventType: "LOGOUT"

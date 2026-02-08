@@ -7,7 +7,7 @@
     "dist"
   ],
   "dependencies": {
-    "@stefanasemota/sabi-logger": "git+https://github.com/stefanasemota/sabi-logger.git#main",
+    "@stefanasemota/sabi-logger": "git+https://github.com/stefanasemota/sabi-logger.git#v2.0.1",
     "@stefanasemota/stripe-core-service": "git+https://github.com/stefanasemota/stripe-core-service.git#v1.0.11",
     "firebase": ">=10.0.0"
   },
