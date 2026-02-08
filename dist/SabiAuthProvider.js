@@ -36,6 +36,7 @@ const SabiAuthProvider = ({ children, firebaseConfig, onLoginCallback, }) => {
                     // 3. TRIGGER SERVER-SIDE LOGIN LOGGING (if callback provided)
                     if (onLoginCallback) {
                         try {
+                            console.log("🔐 SabiAuth: Triggering login callback for", u.uid);
                             await onLoginCallback(u.uid);
                         }
                         catch (error) {
