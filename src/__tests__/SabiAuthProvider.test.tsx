@@ -190,4 +190,42 @@ describe('SabiAuthProvider', () => {
 
         expect(signOut).toHaveBeenCalled();
     });
+
+    it('calls onLoginCallback when user signs in', async () => {
+        const onLoginCallback = jest.fn().mockResolvedValue(undefined);
+        (onAuthStateChanged as jest.Mock).mockImplementation((auth, callback) => {
+            callback(mockUser);
+            return jest.fn();
+        });
+        (getDoc as jest.Mock).mockResolvedValue({ exists: () => false });
+
+        render(
+            <SabiAuthProvider firebaseConfig={firebaseConfig} onLoginCallback={onLoginCallback}>
+                <TestConsumer />
+            </SabiAuthProvider>
+        );
+
+        await waitFor(() => expect(onLoginCallback).toHaveBeenCalledWith(mockUser.uid));
+    });
+
+    it('handles onLoginCallback errors gracefully', async () => {
+        const onLoginCallback = jest.fn().mockRejectedValue(new Error('Callback failed'));
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => { });
+
+        (onAuthStateChanged as jest.Mock).mockImplementation((auth, callback) => {
+            callback(mockUser);
+            return jest.fn();
+        });
+        (getDoc as jest.Mock).mockResolvedValue({ exists: () => false });
+
+        render(
+            <SabiAuthProvider firebaseConfig={firebaseConfig} onLoginCallback={onLoginCallback}>
+                <TestConsumer />
+            </SabiAuthProvider>
+        );
+
+        await waitFor(() => expect(onLoginCallback).toHaveBeenCalled());
+        expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Login callback failed'), expect.any(Error));
+        consoleSpy.mockRestore();
+    });
 });
