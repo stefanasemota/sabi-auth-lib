@@ -325,4 +325,62 @@ describe('Admin Service (Generic Auth Actions)', () => {
             consoleSpy.mockRestore();
         });
     });
+
+    // =========================================================================
+    // getSabiVerifiedSession — JWT Dual-Engine Support (v1.5.0)
+    // =========================================================================
+    describe('getSabiVerifiedSession', () => {
+        const { getSabiVerifiedSession } = require('../application/admin.service');
+
+        it('should return null when no __session cookie is present', async () => {
+            mockCookieStore.get.mockReturnValue(undefined);
+            const verifier = jest.fn();
+
+            const result = await getSabiVerifiedSession(verifier);
+
+            expect(result).toBeNull();
+            expect(verifier).not.toHaveBeenCalled();
+        });
+
+        it('should call verifier with the raw cookie value', async () => {
+            const rawCookie = 'raw.cookie.value';
+            mockCookieStore.get.mockReturnValue({ value: rawCookie });
+            const verifier = jest.fn().mockResolvedValue({ userId: 'uid-abc123' });
+
+            await getSabiVerifiedSession(verifier);
+
+            expect(verifier).toHaveBeenCalledWith(rawCookie);
+        });
+
+        it('should return { userId, isAuthenticated: true } when verifier succeeds', async () => {
+            mockCookieStore.get.mockReturnValue({ value: 'some.jwt.cookie' });
+            const verifier = jest.fn().mockResolvedValue({ userId: 'uid-28charFirebaseUID' });
+
+            const result = await getSabiVerifiedSession(verifier);
+
+            expect(result).toEqual({
+                userId: 'uid-28charFirebaseUID',
+                isAuthenticated: true,
+            });
+        });
+
+        it('should return null when verifier returns null (expired/invalid token)', async () => {
+            mockCookieStore.get.mockReturnValue({ value: 'expired.jwt.cookie' });
+            const verifier = jest.fn().mockResolvedValue(null);
+
+            const result = await getSabiVerifiedSession(verifier);
+
+            expect(result).toBeNull();
+        });
+
+        it('should return null and not throw when verifier throws', async () => {
+            mockCookieStore.get.mockReturnValue({ value: 'bad.jwt.cookie' });
+            const verifier = jest.fn().mockRejectedValue(new Error('JWT verification failed'));
+
+            // Must not throw
+            const result = await getSabiVerifiedSession(verifier);
+
+            expect(result).toBeNull();
+        });
+    });
 });

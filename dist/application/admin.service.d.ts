@@ -31,8 +31,34 @@ export declare function loginAdmin(appId: string, formData: FormData, correctPas
 /**
  * SERVER SESSION HELPER
  * Verifies the __session cookie on the server.
+ * Returns the raw cookie value as userId (suitable for password-based admin sessions).
  */
 export declare function getSabiServerSession(): Promise<{
+    userId: string;
+    isAuthenticated: boolean;
+} | null>;
+/**
+ * JWT-AWARE SESSION HELPER (v1.5.0)
+ * "Dual-Engine" mode — detects and properly handles Firebase JWT session cookies.
+ *
+ * The caller supplies a `verifier` callback that performs the actual JWT verification
+ * (e.g. firebase-admin's verifySessionCookie). This keeps the library decoupled from
+ * firebase-admin while giving apps a clean, standardised way to extract the real UID.
+ *
+ * @example
+ * // In your app:
+ * const session = await getSabiVerifiedSession(async (cookie) => {
+ *   const claims = await adminAuth.verifySessionCookie(cookie, true);
+ *   return { userId: claims.uid };
+ * });
+ *
+ * @param verifier - Async callback that receives the raw cookie value and returns
+ *                   `{ userId: string }` on success, or `null` if the token is invalid.
+ * @returns `{ userId: string; isAuthenticated: true }` on success, or `null`.
+ */
+export declare function getSabiVerifiedSession(verifier: (cookie: string) => Promise<{
+    userId: string;
+} | null>): Promise<{
     userId: string;
     isAuthenticated: boolean;
 } | null>;

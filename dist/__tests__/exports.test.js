@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+jest.mock('server-only', () => ({}));
 // src/__tests__/exports.test.ts
 // Mock the logger dependency before imports ensuring it's available for indirect imports
 jest.mock("@stefanasemota/sabi-logger", () => ({
@@ -13,6 +14,7 @@ describe("Sabi Auth Library: Package Integrity", () => {
     });
     test("should have all required server exports", () => {
         expect(index_1.getSabiServerSession).toBeDefined();
+        expect(index_1.getSabiVerifiedSession).toBeDefined();
         expect(index_1.createAdminMiddleware).toBeDefined();
         expect(index_1.loginAdmin).toBeDefined();
         expect(index_1.deleteUserSessionAction).toBeDefined();
@@ -22,5 +24,6 @@ describe("Sabi Auth Library: Package Integrity", () => {
         expect(typeof index_1.useAuth).toBe("function");
         expect(typeof index_1.SabiAuthProvider).toBe("function");
         expect(typeof index_1.deleteUserSessionAction).toBe("function");
+        expect(typeof index_1.getSabiVerifiedSession).toBe("function");
     });
 });
