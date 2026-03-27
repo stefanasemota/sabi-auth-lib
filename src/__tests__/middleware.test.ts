@@ -87,4 +87,47 @@ describe('Admin Middleware', () => {
         expect(NextResponse.next).toHaveBeenCalled();
         expect(res).toEqual({ type: 'next' });
     });
+
+    // ── LOOP-KILLER tests ────────────────────────────────────────────────────
+
+    it('should always pass /api/auth/session through (autoSessionCookie sync endpoint)', () => {
+        // No session cookie — should still be allowed through unconditionally
+        const req = createMockRequest('/api/auth/session');
+        const res = middleware(req);
+
+        expect(NextResponse.next).toHaveBeenCalled();
+        expect(res).toEqual({ type: 'next' });
+    });
+
+    it('should pass any /api/auth/* route through regardless of session cookie', () => {
+        const req = createMockRequest('/api/auth/callback/google');
+        const res = middleware(req);
+
+        expect(NextResponse.next).toHaveBeenCalled();
+        expect(res).toEqual({ type: 'next' });
+    });
+
+    it('should NOT short-circuit /api/ routes outside of /api/auth', () => {
+        // /api/data has no session, but middleware doesn't protect non-admin routes
+        const req = createMockRequest('/api/data');
+        const res = middleware(req);
+
+        expect(NextResponse.next).toHaveBeenCalled();
+        expect(res).toEqual({ type: 'next' });
+    });
+
+    it('brokenMiddleware: /api/auth/* still bypasses even when adminPassword is missing', () => {
+        const brokenMiddleware = createAdminMiddleware(undefined);
+        const req = createMockRequest('/api/auth/session');
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => { });
+
+        const res = brokenMiddleware(req);
+
+        // Must NOT redirect even when password is missing
+        expect(NextResponse.redirect).not.toHaveBeenCalled();
+        expect(NextResponse.next).toHaveBeenCalled();
+        expect(res).toEqual({ type: 'next' });
+
+        consoleSpy.mockRestore();
+    });
 });
