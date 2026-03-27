@@ -1,0 +1,129 @@
+
+[1m[46m RUN [49m[22m [36mv4.1.2 [39m[90m/Users/aostefan/Developer/sabi-auth-lib[39m
+
+FirebaseError: Firebase: No Firebase App '[DEFAULT]' has been created - call initializeApp() first (app/no-app).
+    at getApp (file:///Users/aostefan/Developer/sabi-auth-lib/node_modules/@firebase/app/dist/esm/index.esm.js:726:29)
+    at getAuth (file:///Users/aostefan/Developer/sabi-auth-lib/node_modules/firebase/node_modules/@firebase/auth/dist/node-esm/totp-05d844a5.js:7336:24)
+    at SabiAuthProvider (/Users/aostefan/Developer/sabi-auth-lib/src/SabiAuthProvider.tsx:45:16)
+    at renderWithHooks (/Users/aostefan/Developer/sabi-auth-lib/node_modules/react-dom/cjs/react-dom.development.js:15486:18)
+    at mountIndeterminateComponent (/Users/aostefan/Developer/sabi-auth-lib/node_modules/react-dom/cjs/react-dom.development.js:20103:13)
+    at beginWork (/Users/aostefan/Developer/sabi-auth-lib/node_modules/react-dom/cjs/react-dom.development.js:21626:16)
+    at HTMLUnknownElement.callCallback (/Users/aostefan/Developer/sabi-auth-lib/node_modules/react-dom/cjs/react-dom.development.js:4164:14)
+    at HTMLUnknownElement.callTheUserObjectsOperation (/Users/aostefan/Developer/sabi-auth-lib/node_modules/jsdom/lib/generated/idl/EventListener.js:26:30)
+    at innerInvokeEventListeners (/Users/aostefan/Developer/sabi-auth-lib/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:360:16)
+    at invokeEventListeners (/Users/aostefan/Developer/sabi-auth-lib/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:296:3)
+FirebaseError: Firebase: No Firebase App '[DEFAULT]' has been created - call initializeApp() first (app/no-app).
+    at getApp (file:///Users/aostefan/Developer/sabi-auth-lib/node_modules/@firebase/app/dist/esm/index.esm.js:726:29)
+    at getAuth (file:///Users/aostefan/Developer/sabi-auth-lib/node_modules/firebase/node_modules/@firebase/auth/dist/node-esm/totp-05d844a5.js:7336:24)
+    at SabiAuthProvider (/Users/aostefan/Developer/sabi-auth-lib/src/SabiAuthProvider.tsx:45:16)
+    at renderWithHooks (/Users/aostefan/Developer/sabi-auth-lib/node_modules/react-dom/cjs/react-dom.development.js:15486:18)
+    at mountIndeterminateComponent (/Users/aostefan/Developer/sabi-auth-lib/node_modules/react-dom/cjs/react-dom.development.js:20103:13)
+    at beginWork (/Users/aostefan/Developer/sabi-auth-lib/node_modules/react-dom/cjs/react-dom.development.js:21626:16)
+    at HTMLUnknownElement.callCallback (/Users/aostefan/Developer/sabi-auth-lib/node_modules/react-dom/cjs/react-dom.development.js:4164:14)
+    at HTMLUnknownElement.callTheUserObjectsOperation (/Users/aostefan/Developer/sabi-auth-lib/node_modules/jsdom/lib/generated/idl/EventListener.js:26:30)
+    at innerInvokeEventListeners (/Users/aostefan/Developer/sabi-auth-lib/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:360:16)
+    at invokeEventListeners (/Users/aostefan/Developer/sabi-auth-lib/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:296:3)
+[90mstderr[2m | tests/bdd/auth_flow.test.tsx[2m > [22m[2mBDD: Auth Flow[2m > [22m[2mSzenario: Google Login mit Auto-Sync & Fast-Redirect[2m > [22m[2mGiven: Sabi-Auth is configured with autoSessionCookie and experimentalFastRedirect... When: login is called... Then: POST to /api/auth/session and redirect to current url (dashboard)
+[22m[39mThe above error occurred in the <SabiAuthProvider> component:
+
+    at SabiAuthProvider (/Users/aostefan/Developer/sabi-auth-lib/src/SabiAuthProvider.tsx:16:29)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+
+FirebaseError: Firebase: No Firebase App '[DEFAULT]' has been created - call initializeApp() first (app/no-app).
+    at getApp (file:///Users/aostefan/Developer/sabi-auth-lib/node_modules/@firebase/app/dist/esm/index.esm.js:726:29)
+    at getAuth (file:///Users/aostefan/Developer/sabi-auth-lib/node_modules/firebase/node_modules/@firebase/auth/dist/node-esm/totp-05d844a5.js:7336:24)
+    at SabiAuthProvider (/Users/aostefan/Developer/sabi-auth-lib/src/SabiAuthProvider.tsx:45:16)
+    at renderWithHooks (/Users/aostefan/Developer/sabi-auth-lib/node_modules/react-dom/cjs/react-dom.development.js:15486:18)
+    at mountIndeterminateComponent (/Users/aostefan/Developer/sabi-auth-lib/node_modules/react-dom/cjs/react-dom.development.js:20103:13)
+    at beginWork (/Users/aostefan/Developer/sabi-auth-lib/node_modules/react-dom/cjs/react-dom.development.js:21626:16)
+    at HTMLUnknownElement.callCallback (/Users/aostefan/Developer/sabi-auth-lib/node_modules/react-dom/cjs/react-dom.development.js:4164:14)
+    at HTMLUnknownElement.callTheUserObjectsOperation (/Users/aostefan/Developer/sabi-auth-lib/node_modules/jsdom/lib/generated/idl/EventListener.js:26:30)
+    at innerInvokeEventListeners (/Users/aostefan/Developer/sabi-auth-lib/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:360:16)
+    at invokeEventListeners (/Users/aostefan/Developer/sabi-auth-lib/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:296:3)
+FirebaseError: Firebase: No Firebase App '[DEFAULT]' has been created - call initializeApp() first (app/no-app).
+    at getApp (file:///Users/aostefan/Developer/sabi-auth-lib/node_modules/@firebase/app/dist/esm/index.esm.js:726:29)
+    at getAuth (file:///Users/aostefan/Developer/sabi-auth-lib/node_modules/firebase/node_modules/@firebase/auth/dist/node-esm/totp-05d844a5.js:7336:24)
+    at SabiAuthProvider (/Users/aostefan/Developer/sabi-auth-lib/src/SabiAuthProvider.tsx:45:16)
+    at renderWithHooks (/Users/aostefan/Developer/sabi-auth-lib/node_modules/react-dom/cjs/react-dom.development.js:15486:18)
+    at mountIndeterminateComponent (/Users/aostefan/Developer/sabi-auth-lib/node_modules/react-dom/cjs/react-dom.development.js:20103:13)
+    at beginWork (/Users/aostefan/Developer/sabi-auth-lib/node_modules/react-dom/cjs/react-dom.development.js:21626:16)
+    at HTMLUnknownElement.callCallback (/Users/aostefan/Developer/sabi-auth-lib/node_modules/react-dom/cjs/react-dom.development.js:4164:14)
+    at HTMLUnknownElement.callTheUserObjectsOperation (/Users/aostefan/Developer/sabi-auth-lib/node_modules/jsdom/lib/generated/idl/EventListener.js:26:30)
+    at innerInvokeEventListeners (/Users/aostefan/Developer/sabi-auth-lib/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:360:16)
+    at invokeEventListeners (/Users/aostefan/Developer/sabi-auth-lib/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:296:3)
+[90mstderr[2m | tests/bdd/auth_flow.test.tsx[2m > [22m[2mBDD: Auth Flow[2m > [22m[2mSzenario: Hintergrund Token-Refresh[2m > [22m[2mGiven: User is logged in... When: Firebase triggers onIdTokenChanged with new token... Then: Library syncs via POST
+[22m[39mThe above error occurred in the <SabiAuthProvider> component:
+
+    at SabiAuthProvider (/Users/aostefan/Developer/sabi-auth-lib/src/SabiAuthProvider.tsx:16:29)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+
+FirebaseError: Firebase: No Firebase App '[DEFAULT]' has been created - call initializeApp() first (app/no-app).
+    at getApp (file:///Users/aostefan/Developer/sabi-auth-lib/node_modules/@firebase/app/dist/esm/index.esm.js:726:29)
+    at getAuth (file:///Users/aostefan/Developer/sabi-auth-lib/node_modules/firebase/node_modules/@firebase/auth/dist/node-esm/totp-05d844a5.js:7336:24)
+    at SabiAuthProvider (/Users/aostefan/Developer/sabi-auth-lib/src/SabiAuthProvider.tsx:45:16)
+    at renderWithHooks (/Users/aostefan/Developer/sabi-auth-lib/node_modules/react-dom/cjs/react-dom.development.js:15486:18)
+    at mountIndeterminateComponent (/Users/aostefan/Developer/sabi-auth-lib/node_modules/react-dom/cjs/react-dom.development.js:20103:13)
+    at beginWork (/Users/aostefan/Developer/sabi-auth-lib/node_modules/react-dom/cjs/react-dom.development.js:21626:16)
+    at HTMLUnknownElement.callCallback (/Users/aostefan/Developer/sabi-auth-lib/node_modules/react-dom/cjs/react-dom.development.js:4164:14)
+    at HTMLUnknownElement.callTheUserObjectsOperation (/Users/aostefan/Developer/sabi-auth-lib/node_modules/jsdom/lib/generated/idl/EventListener.js:26:30)
+    at innerInvokeEventListeners (/Users/aostefan/Developer/sabi-auth-lib/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:360:16)
+    at invokeEventListeners (/Users/aostefan/Developer/sabi-auth-lib/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:296:3)
+FirebaseError: Firebase: No Firebase App '[DEFAULT]' has been created - call initializeApp() first (app/no-app).
+    at getApp (file:///Users/aostefan/Developer/sabi-auth-lib/node_modules/@firebase/app/dist/esm/index.esm.js:726:29)
+    at getAuth (file:///Users/aostefan/Developer/sabi-auth-lib/node_modules/firebase/node_modules/@firebase/auth/dist/node-esm/totp-05d844a5.js:7336:24)
+    at SabiAuthProvider (/Users/aostefan/Developer/sabi-auth-lib/src/SabiAuthProvider.tsx:45:16)
+    at renderWithHooks (/Users/aostefan/Developer/sabi-auth-lib/node_modules/react-dom/cjs/react-dom.development.js:15486:18)
+    at mountIndeterminateComponent (/Users/aostefan/Developer/sabi-auth-lib/node_modules/react-dom/cjs/react-dom.development.js:20103:13)
+    at beginWork (/Users/aostefan/Developer/sabi-auth-lib/node_modules/react-dom/cjs/react-dom.development.js:21626:16)
+    at HTMLUnknownElement.callCallback (/Users/aostefan/Developer/sabi-auth-lib/node_modules/react-dom/cjs/react-dom.development.js:4164:14)
+    at HTMLUnknownElement.callTheUserObjectsOperation (/Users/aostefan/Developer/sabi-auth-lib/node_modules/jsdom/lib/generated/idl/EventListener.js:26:30)
+    at innerInvokeEventListeners (/Users/aostefan/Developer/sabi-auth-lib/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:360:16)
+    at invokeEventListeners (/Users/aostefan/Developer/sabi-auth-lib/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:296:3)
+[90mstderr[2m | tests/bdd/auth_flow.test.tsx[2m > [22m[2mBDD: Auth Flow[2m > [22m[2mSzenario: Logout & Session-Cleanup[2m > [22m[2mGiven: Active session exists... When: logout called... Then: DELETE to API and redirect to /
+[22m[39mThe above error occurred in the <SabiAuthProvider> component:
+
+    at SabiAuthProvider (/Users/aostefan/Developer/sabi-auth-lib/src/SabiAuthProvider.tsx:16:29)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+
+ [31m❯[39m tests/bdd/auth_flow.test.tsx [2m([22m[2m3 tests[22m[2m | [22m[31m3 failed[39m[2m)[22m[32m 44[2mms[22m[39m
+[31m       [31m×[31m Given: Sabi-Auth is configured with autoSessionCookie and experimentalFastRedirect... When: login is called... Then: POST to /api/auth/session and redirect to current url (dashboard)[39m[32m 33[2mms[22m[39m
+[31m       [31m×[31m Given: User is logged in... When: Firebase triggers onIdTokenChanged with new token... Then: Library syncs via POST[39m[32m 4[2mms[22m[39m
+[31m       [31m×[31m Given: Active session exists... When: logout called... Then: DELETE to API and redirect to /[39m[32m 4[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 3 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m tests/bdd/auth_flow.test.tsx[2m > [22mBDD: Auth Flow[2m > [22mSzenario: Google Login mit Auto-Sync & Fast-Redirect[2m > [22mGiven: Sabi-Auth is configured with autoSessionCookie and experimentalFastRedirect... When: login is called... Then: POST to /api/auth/session and redirect to current url (dashboard)
+[41m[1m FAIL [22m[49m tests/bdd/auth_flow.test.tsx[2m > [22mBDD: Auth Flow[2m > [22mSzenario: Hintergrund Token-Refresh[2m > [22mGiven: User is logged in... When: Firebase triggers onIdTokenChanged with new token... Then: Library syncs via POST
+[41m[1m FAIL [22m[49m tests/bdd/auth_flow.test.tsx[2m > [22mBDD: Auth Flow[2m > [22mSzenario: Logout & Session-Cleanup[2m > [22mGiven: Active session exists... When: logout called... Then: DELETE to API and redirect to /
+[31m[1mFirebaseError[22m: Firebase: No Firebase App '[DEFAULT]' has been created - call initializeApp() first (app/no-app).[39m
+[90m [2m❯[22m getApp node_modules/@firebase/app/src/api.ts:[2m385:24[22m[39m
+[90m [2m❯[22m getAuth node_modules/firebase/node_modules/@firebase/auth/src/platform_node/index.ts:[2m38:43[22m[39m
+[36m [2m❯[22m SabiAuthProvider src/SabiAuthProvider.tsx:[2m45:16[22m[39m
+    [90m 43|[39m   [35mconst[39m app [33m=[39m
+    [90m 44|[39m     getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()…
+    [90m 45|[39m   [35mconst[39m auth [33m=[39m [34mgetAuth[39m(app)[33m;[39m
+    [90m   |[39m                [31m^[39m
+    [90m 46|[39m   [35mconst[39m db [33m=[39m [34mgetFirestore[39m(app)[33m;[39m
+    [90m 47|[39m
+[90m [2m❯[22m renderWithHooks node_modules/react-dom/cjs/react-dom.development.js:[2m15486:18[22m[39m
+[90m [2m❯[22m mountIndeterminateComponent node_modules/react-dom/cjs/react-dom.development.js:[2m20103:13[22m[39m
+[90m [2m❯[22m beginWork node_modules/react-dom/cjs/react-dom.development.js:[2m21626:16[22m[39m
+[90m [2m❯[22m beginWork$1 node_modules/react-dom/cjs/react-dom.development.js:[2m27465:14[22m[39m
+[90m [2m❯[22m performUnitOfWork node_modules/react-dom/cjs/react-dom.development.js:[2m26599:12[22m[39m
+[90m [2m❯[22m workLoopSync node_modules/react-dom/cjs/react-dom.development.js:[2m26505:5[22m[39m
+[90m [2m❯[22m renderRootSync node_modules/react-dom/cjs/react-dom.development.js:[2m26473:7[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m3 failed[39m[22m[90m (3)[39m
+[2m   Start at [22m 14:24:29
+[2m   Duration [22m 2.39s[2m (transform 82ms, setup 140ms, import 187ms, tests 44ms, environment 1.43s)[22m
+

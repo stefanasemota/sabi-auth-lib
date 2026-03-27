@@ -78,6 +78,11 @@ const SabiAuthProvider = ({ children, firebaseConfig, onLoginCallback, autoSessi
                 cachedIdTokenRef.current = null;
                 setUser(null);
                 document.cookie = `__session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;`;
+                if (autoSessionCookie) {
+                    fetch("/api/auth/session", {
+                        method: "DELETE",
+                    }).catch((err) => console.error("⚠️ SabiAuth: Auto session-cookie DELETE failed", err));
+                }
                 // FAST REDIRECT on logout
                 if (experimentalFastRedirect && typeof window !== "undefined") {
                     navigateTo("/");

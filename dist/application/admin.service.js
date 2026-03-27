@@ -21,11 +21,33 @@ const sabi_logger_1 = require("@stefanasemota/sabi-logger");
 /**
  * 1. THE MIDDLEWARE FACTORY
  * Ensures Firebase compatibility and prevents redirect loops.
+ *
+ * LOOP-KILLER: The middleware must NEVER redirect /api/auth/* routes.
+ * If the autoSessionCookie POST to /api/auth/session is intercepted before
+ * it reaches the API handler, no session cookie can be set, causing the app
+ * to believe the user is logged out → infinite loop.
+ *
+ * Recommended Next.js matcher (add to your middleware export config):
+ * @example
+ * export const config = {
+ *   matcher: [
+ *     // Skip all static files and ALL auth API routes
+ *     '/((?!_next/static|_next/image|favicon.ico|api/auth).*)',
+ *   ],
+ * };
  */
 function createAdminMiddleware(adminPassword) {
     return function middleware(request) {
         const { pathname } = request.nextUrl;
         const authToken = request.cookies.get("__session")?.value;
+        // ── LOOP-KILLER ──────────────────────────────────────────────────────
+        // Pass ALL /api/auth/* requests through without any check.
+        // This allows sabi-auth's autoSessionCookie sync (POST /api/auth/session)
+        // and any other auth API routes to function correctly.
+        if (pathname.startsWith("/api/auth")) {
+            return server_1.NextResponse.next();
+        }
+        // ─────────────────────────────────────────────────────────────────────
         if (pathname.startsWith("/admin-login")) {
             return server_1.NextResponse.next();
         }
