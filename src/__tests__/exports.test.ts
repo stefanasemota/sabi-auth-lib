@@ -9,6 +9,7 @@ import {
   SabiAuthProvider,
   useAuth,
   getSabiServerSession,
+  getSabiVerifiedSession,
   createAdminMiddleware,
   loginAdmin,
   deleteUserSessionAction,
@@ -22,6 +23,7 @@ describe("Sabi Auth Library: Package Integrity", () => {
 
   test("should have all required server exports", () => {
     expect(getSabiServerSession).toBeDefined();
+    expect(getSabiVerifiedSession).toBeDefined();
     expect(createAdminMiddleware).toBeDefined();
     expect(loginAdmin).toBeDefined();
     expect(deleteUserSessionAction).toBeDefined();
@@ -32,5 +34,6 @@ describe("Sabi Auth Library: Package Integrity", () => {
     expect(typeof useAuth).toBe("function");
     expect(typeof SabiAuthProvider).toBe("function");
     expect(typeof deleteUserSessionAction).toBe("function");
+    expect(typeof getSabiVerifiedSession).toBe("function");
   });
 });

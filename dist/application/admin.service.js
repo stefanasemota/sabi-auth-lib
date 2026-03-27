@@ -8,6 +8,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createAdminMiddleware = createAdminMiddleware;
 exports.loginAdmin = loginAdmin;
 exports.getSabiServerSession = getSabiServerSession;
+exports.getSabiVerifiedSession = getSabiVerifiedSession;
 exports.deleteUserSessionAction = deleteUserSessionAction;
 exports.getAuthUserAction = getAuthUserAction;
 exports.resolveUserIdentityAction = resolveUserIdentityAction;
@@ -75,6 +76,7 @@ async function loginAdmin(appId, formData, correctPassword) {
 /**
  * SERVER SESSION HELPER
  * Verifies the __session cookie on the server.
+ * Returns the raw cookie value as userId (suitable for password-based admin sessions).
  */
 async function getSabiServerSession() {
     const cookieStore = await (0, headers_1.cookies)();
@@ -85,6 +87,41 @@ async function getSabiServerSession() {
         userId: sessionToken,
         isAuthenticated: true,
     };
+}
+/**
+ * JWT-AWARE SESSION HELPER (v1.5.0)
+ * "Dual-Engine" mode — detects and properly handles Firebase JWT session cookies.
+ *
+ * The caller supplies a `verifier` callback that performs the actual JWT verification
+ * (e.g. firebase-admin's verifySessionCookie). This keeps the library decoupled from
+ * firebase-admin while giving apps a clean, standardised way to extract the real UID.
+ *
+ * @example
+ * // In your app:
+ * const session = await getSabiVerifiedSession(async (cookie) => {
+ *   const claims = await adminAuth.verifySessionCookie(cookie, true);
+ *   return { userId: claims.uid };
+ * });
+ *
+ * @param verifier - Async callback that receives the raw cookie value and returns
+ *                   `{ userId: string }` on success, or `null` if the token is invalid.
+ * @returns `{ userId: string; isAuthenticated: true }` on success, or `null`.
+ */
+async function getSabiVerifiedSession(verifier) {
+    const cookieStore = await (0, headers_1.cookies)();
+    const sessionCookie = cookieStore.get("__session")?.value;
+    if (!sessionCookie)
+        return null;
+    try {
+        const result = await verifier(sessionCookie);
+        if (!result)
+            return null;
+        return { userId: result.userId, isAuthenticated: true };
+    }
+    catch {
+        // Covers: expired, revoked, malformed, or invalid JWT cookies
+        return null;
+    }
 }
 /**
  * 3. THE LOGOUT ACTION (Generic)
@@ -117,7 +154,7 @@ async function deleteUserSessionAction(auth, appId) {
     return { success: true };
 }
 // ============================================================================
-// PART 4: GENERIC AUTH ACTIONS (v1.3.9)
+// PART 4: GENERIC AUTH ACTIONS (v1.5.0)
 // ============================================================================
 /**
  * GENERIC ACTION: getAuthUserAction

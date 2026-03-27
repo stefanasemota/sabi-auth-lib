@@ -8,11 +8,15 @@ import { SabiAuthProvider, useAuth } from "./SabiAuthProvider";
 // 1. Re-export Client Components
 export { SabiAuthProvider, useAuth };
 
+// 2. Re-export Domain Types (v0.3.0)
+export type { SabiAuthConfig, SabiUser, AuthContextType } from "./core/domain";
+
 // 2. Re-export Application Services
 export {
   createAdminMiddleware,
   getAuthUserAction,
   getSabiServerSession,
+  getSabiVerifiedSession,
   loginAdmin,
   deleteUserSessionAction,
   resolveUserIdentityAction,

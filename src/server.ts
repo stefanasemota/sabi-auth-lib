@@ -9,6 +9,7 @@ export {
     createAdminMiddleware,
     getAuthUserAction,
     getSabiServerSession,
+    getSabiVerifiedSession,
     loginAdmin,
     deleteUserSessionAction,
     resolveUserIdentityAction,

@@ -16,11 +16,34 @@ import { logAuthEvent } from "@stefanasemota/sabi-logger";
 /**
  * 1. THE MIDDLEWARE FACTORY
  * Ensures Firebase compatibility and prevents redirect loops.
+ *
+ * LOOP-KILLER: The middleware must NEVER redirect /api/auth/* routes.
+ * If the autoSessionCookie POST to /api/auth/session is intercepted before
+ * it reaches the API handler, no session cookie can be set, causing the app
+ * to believe the user is logged out → infinite loop.
+ *
+ * Recommended Next.js matcher (add to your middleware export config):
+ * @example
+ * export const config = {
+ *   matcher: [
+ *     // Skip all static files and ALL auth API routes
+ *     '/((?!_next/static|_next/image|favicon.ico|api/auth).*)',
+ *   ],
+ * };
  */
 export function createAdminMiddleware(adminPassword: string | undefined) {
     return function middleware(request: NextRequest) {
         const { pathname } = request.nextUrl;
         const authToken = request.cookies.get("__session")?.value;
+
+        // ── LOOP-KILLER ──────────────────────────────────────────────────────
+        // Pass ALL /api/auth/* requests through without any check.
+        // This allows sabi-auth's autoSessionCookie sync (POST /api/auth/session)
+        // and any other auth API routes to function correctly.
+        if (pathname.startsWith("/api/auth")) {
+            return NextResponse.next();
+        }
+        // ─────────────────────────────────────────────────────────────────────
 
         if (pathname.startsWith("/admin-login")) {
             return NextResponse.next();
@@ -87,6 +110,7 @@ export async function loginAdmin(
 /**
  * SERVER SESSION HELPER
  * Verifies the __session cookie on the server.
+ * Returns the raw cookie value as userId (suitable for password-based admin sessions).
  */
 export async function getSabiServerSession() {
     const cookieStore = await cookies();
@@ -98,6 +122,43 @@ export async function getSabiServerSession() {
         userId: sessionToken,
         isAuthenticated: true,
     };
+}
+
+/**
+ * JWT-AWARE SESSION HELPER (v1.5.0)
+ * "Dual-Engine" mode — detects and properly handles Firebase JWT session cookies.
+ *
+ * The caller supplies a `verifier` callback that performs the actual JWT verification
+ * (e.g. firebase-admin's verifySessionCookie). This keeps the library decoupled from
+ * firebase-admin while giving apps a clean, standardised way to extract the real UID.
+ *
+ * @example
+ * // In your app:
+ * const session = await getSabiVerifiedSession(async (cookie) => {
+ *   const claims = await adminAuth.verifySessionCookie(cookie, true);
+ *   return { userId: claims.uid };
+ * });
+ *
+ * @param verifier - Async callback that receives the raw cookie value and returns
+ *                   `{ userId: string }` on success, or `null` if the token is invalid.
+ * @returns `{ userId: string; isAuthenticated: true }` on success, or `null`.
+ */
+export async function getSabiVerifiedSession(
+    verifier: (cookie: string) => Promise<{ userId: string } | null>
+): Promise<{ userId: string; isAuthenticated: boolean } | null> {
+    const cookieStore = await cookies();
+    const sessionCookie = cookieStore.get("__session")?.value;
+
+    if (!sessionCookie) return null;
+
+    try {
+        const result = await verifier(sessionCookie);
+        if (!result) return null;
+        return { userId: result.userId, isAuthenticated: true };
+    } catch {
+        // Covers: expired, revoked, malformed, or invalid JWT cookies
+        return null;
+    }
 }
 
 /**
@@ -137,7 +198,7 @@ export async function deleteUserSessionAction(
 }
 
 // ============================================================================
-// PART 4: GENERIC AUTH ACTIONS (v1.3.9)
+// PART 4: GENERIC AUTH ACTIONS (v1.5.0)
 // ============================================================================
 
 /**
