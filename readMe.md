@@ -1,11 +1,22 @@
 # @stefanasemota/sabi-auth
 
-[![Version](https://img.shields.io/github/v/tag/stefanasemota/sabi-auth-lib?label=version&color=orange)](https://github.com/stefanasemota/sabi-auth-lib)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Version](https://img.shields.io/badge/version-1.6.2-blue.svg)](https://github.com/stefanasemota/sabi-auth-lib)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)]()
+[![Firebase](https://img.shields.io/badge/Firebase-Firestore%20%7C%20Auth%20%7C%20Hosting-FFCA28?logo=firebase&logoColor=white)]()
+[![Gemini](https://img.shields.io/badge/Gemini-AI%20Powered-8E75B2?logo=google-gemini&logoColor=white)]()
 
 A lightweight, generic Authentication & User Management library for Next.js and Firebase. Designed to bridge the gap between Firebase Auth and Firestore with pure, dependency-injected Server Actions.
 
 > **Published on npm:** `@stefanasemota/sabi-auth`
+
+## 🏗️ Architectural Summary
+
+`@stefanasemota/sabi-auth` follows an **Onion Architecture** (`src/core/` → `src/application/` → `src/`) with conditional client/server exports (`@stefanasemota/sabi-auth/client` and `@stefanasemota/sabi-auth/server`) and decoupled immutable audit logging via `@stefanasemota/sabi-logger`:
+
+- **Core (`src/core/domain.ts`):** Framework-agnostic TypeScript entities and contracts (`SabiUser`, `AuthContextType`, `SabiAuthConfig`).
+- **Application (`src/application/admin.service.ts`):** Server-only Next.js 15 session management, loop-killer middleware (`createAdminMiddleware`), dual-engine JWT verification (`getSabiVerifiedSession`), identity resolution (`resolveUserIdentityAction`), and locked field mutations (`updateLockedFieldAction`).
+- **Infrastructure (`src/SabiAuthProvider.tsx`):** React Client Provider subscribing to `onIdTokenChanged` with in-memory token caching, optimistic login state, cross-domain `.sabiai.work` session cookies, and optional `/api/auth/session` synchronization.
 
 ## 🚀 Features
 
@@ -106,17 +117,24 @@ export const config = {
 
 ## 🧪 Development & Testing
 
-To run the test suite:
-
 ```bash
-npm test
+npm run dev        # TypeScript watch mode
+npm test           # Run Jest unit tests with coverage
+npm run test:unit  # Run Jest unit tests
+npm run test:bdd   # Run Vitest BDD integration tests
+npm run lint       # Run TypeScript strict typecheck
+npm run build      # Run BDD tests and compile TypeScript
 ```
 
 To release a new version:
 
 ```bash
-npm run ship
+npm run release:patch # or release:minor / release:major
 ```
 
 ## 📄 License
 MIT © Stefan Asemota
+
+---
+
+Powered by <a href="https://github.com/stefanasemota/vibe-coding-guardrail">aos Vibe Coding Guardrail</a> | Fuel the Project - Buy me a coffee: <a href="https://buymeacoffee.com/stephanasex">https://buymeacoffee.com/stephanasex</a>

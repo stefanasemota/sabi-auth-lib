@@ -3,14 +3,16 @@ node_modules/
 .npm
 jspm_packages/
 
-# Environment Inputs
+# Environment Inputs & Secrets
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-.env*.local
-.env.test
+.env*
+*service-account*.json
+*key*.json
+*.pem
+
+# Artifacts & Scratch Logs
+*.tgz
+vitest_out*.txt
 
 # Build and Output
 build/

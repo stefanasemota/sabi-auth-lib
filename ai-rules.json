@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "1.0.0",
+  "project": "@stefanasemota/sabi-auth",
+  "profile": "antigravity",
+  "gitStrategy": {
+    "protectedBranches": ["main", "master", "development"],
+    "branchPrefixes": ["feature/", "fix/", "chore/", "refactor/", "test/", "docs/"],
+    "requireDraftPR": true,
+    "allowDirectMerge": false,
+    "enforceVersionTagSync": true
+  },
+  "executionDiscipline": {
+    "verifyBaselineBeforeEdit": true,
+    "lookBeforeYouLeap": true,
+    "dependencyLockdown": true,
+    "fixOwnBugs": true,
+    "documentationSync": true,
+    "zeroAiSlop": true,
+    "maxPatchLines": 50
+  },
+  "commitConventions": {
+    "types": ["feat", "fix", "docs", "chore", "refactor", "test", "style", "perf"],
+    "requireExplainTheFixOnBugfix": true,
+    "atomicCommits": true
+  },
+  "dateFormat": {
+    "standard": "DD.MM.YYYY",
+    "ordering": "newest-first",
+    "appliesTo": ["decision.md", "aos-audit.md"]
+  }
+}
