@@ -1,6 +1,24 @@
 {
   "name": "@stefanasemota/sabi-auth",
   "version": "1.6.2",
+  "description": "Lightweight Authentication & User Management library for Next.js 15 and Firebase with dependency-injected Server Actions and Sabi-Hub audit logging.",
+  "author": {
+    "name": "Stephan Asemota",
+    "email": "stefan@asemota.ch",
+    "url": "https://asemota.ch/"
+  },
+  "keywords": [
+    "node",
+    "npm",
+    "project",
+    "vibecoding tool",
+    "https://sabiai.work/",
+    "7-Phase Feature Development Workflow"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stefanasemota/sabi-auth-lib.git"
+  },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
@@ -27,9 +45,12 @@
     "server-only": "^0.0.1"
   },
   "scripts": {
-    "test": "npx jest --coverage",
-    "test:bdd": "vitest run tests/bdd",
+    "dev": "tsc --watch",
     "build": "npm run test:bdd && tsc",
+    "test": "npx jest --coverage",
+    "test:unit": "npx jest",
+    "test:bdd": "vitest run tests/bdd",
+    "lint": "tsc --noEmit",
     "ship": "git push origin main --tags",
     "prepare": "npm run build && (test -d .git && npx husky install || true)",
     "release:patch": "npm version patch && git push origin main --tags",

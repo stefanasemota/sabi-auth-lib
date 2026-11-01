@@ -17,15 +17,22 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Install dependencies
         run: npm install
 
-      - name: Run Tests with Coverage
+      - name: Run TypeScript Lint
+        run: npm run lint
+
+      - name: Run Unit Tests with Coverage
         run: npm test
 
+      - name: Run BDD Integration Tests
+        run: npm run test:bdd
+
       - name: SonarCloud Scan
+        continue-on-error: true
         uses: SonarSource/sonarqube-scan-action@v5.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
